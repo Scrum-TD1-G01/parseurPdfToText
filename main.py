@@ -1,12 +1,8 @@
 import pdftotext
 
 # Load your PDF
-with open("lorem_ipsum.pdf", "rb") as f:
+with open("./testRessources/Boudin-Torres-2006.pdf", "rb") as f:
     pdf = pdftotext.PDF(f)
-
-# If it's password-protected
-with open("secure.pdf", "rb") as f:
-    pdf = pdftotext.PDF(f, "secret")
 
 # How many pages?
 print(len(pdf))
