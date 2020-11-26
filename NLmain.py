@@ -12,8 +12,25 @@ lines = pdf.readlines()
 
 # Dictionnaire data
 data = {'fileName' : "",
-		'Abstract' : "123",
-		'Title' : ""
+		'abstract' : "123",
+		'title' : ""
+		}
+
+# Dictionnaires de balises XML
+beginXml = {'article' : "<article>\n",
+			'preamble' : "<preamble>",
+			'title' : "<title>",
+			'auteur' : "<auteur>",
+			'abstract' : "<abstract>",
+			'biblio' : "<biblio>",
+			}
+
+endXml = {'article' : "<\\article>\n",
+			'preamble' : "\\<preamble>\n",
+			'title' : "<\\title>\n",
+			'auteur' : "<\\auteur>\n",
+			'abstract' : "<\\abstract>\n",
+			'biblio' : "<\\biblio>\n",
 		}
 
 # recuperer le pdf source
@@ -33,17 +50,15 @@ doc = PDFDocument(parser)#cast le PDF en doc dans notre code
 if(doc.info[0]['Title']):
 	try:
 		#sortie.write(doc.info[0]['Title'].decode("utf-16"))
-		data['Title'] = doc.info[0]['Title'].decode("utf-16")
+		data['title'] = doc.info[0]['Title'].decode("utf-16")
 	except UnicodeDecodeError:
 		#sortie.write(str(doc.info[0]['Title']))
-		data['Title'] = str(doc.info[0]['Title'])
+		data['title'] = str(doc.info[0]['Title'])
 else:
 	#sortie.write(lines[0].strip()+'\n')
-	data['Title'] = lines[0].strip()+'\n'
+	data['title'] = lines[0].strip()+'\n'
 
 # sortie.write("\n")
-
-
 
 
 # recuperer l'abstract
@@ -63,14 +78,16 @@ for line in lines:
 		copy = False
 	elif copy:
 		#sortie.write(line.strip())
-		print("IN abstract")
-		data['Abstract'] = data['Abstract']+str(line.strip())
+		data['abstract'] = data['abstract']+str(line.strip())
 
 #sortie.write('\n')
 #sortie.close()
-print(data)
-for i in data.keys():
-	sortie.write(i+": "+data[i]+'\n')
+sortie.write(beginXml['article'])
+sortie.write(beginXml['title'])
+sortie.write(data['title']+endXml['title'])
+sortie.write(beginXml['abstract']+data['abstract']+endXml['abstract'])
+sortie.write(endXml['article'])
+
 pdf.close()
 
 
