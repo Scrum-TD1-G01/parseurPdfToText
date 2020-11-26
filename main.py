@@ -14,6 +14,7 @@ lines = pdf.readlines()
 sortie = open(sys.argv[1]+"_parser.txt","w")  # delete le dernier fichier si il existe
 sortie.write("Fichier Original: \n"+"    "+sys.argv[1]+"\n")
 
+
 #recuperer les metadata et title
 raw_pdf = open(sys.argv[1],'rb')#recuperer le pdf raw pour extract les metadata
 parser = PDFParser(raw_pdf)
