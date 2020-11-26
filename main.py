@@ -4,12 +4,29 @@ import unicodedata
 import os
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
+from xml.etree import ElementTree
+from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+from xml.dom import minidom
+def prettify(elem):
+	rough_string = ElementTree.tostring(elem, 'utf-8')
+	reparsed = minidom.parseString(rough_string)
+	return reparsed.toprettyxml(indent=" ")
+ 
 
 # Convert pdf
 os.system("pdftotext -nopgbrk "+sys.argv[1])
 pdf = open(os.path.splitext(sys.argv[1])[0]+'.txt',"r")
 lines = pdf.readlines()
 
+#genereration template xml
+root = Element('opml')
+root.set('version','1.0')
+head = SubElement(root, 'article')
+title = SubElement(head, 'title')
+auteur = SubElement(head, 'auteur')
+abstract = SubElement(head, 'abstract')
+biblio = SubElement(head, 'biblio')
+print (prettify(root))
 # recuperer le pdf source
 sortie = open(sys.argv[1]+"_parser.txt","w")  # delete le dernier fichier si il existe
 sortie.write("Fichier Original: \n"+"    "+sys.argv[1]+"\n")
