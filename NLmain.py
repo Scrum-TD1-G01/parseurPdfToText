@@ -6,13 +6,13 @@ from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 
 # Convert pdf
-os.system("pdftotext -nopgbrk -layout "+sys.argv[1])
+os.system("pdftotext -nopgbrk "+sys.argv[1])
 pdf = open(os.path.splitext(sys.argv[1])[0]+'.txt',"r")
 lines = pdf.readlines()
 
 # Dictionnaire data
 data = {'fileName' : "",
-		'Abstract' : "",
+		'Abstract' : "123",
 		'Title' : ""
 		}
 
@@ -63,7 +63,8 @@ for line in lines:
 		copy = False
 	elif copy:
 		#sortie.write(line.strip())
-		data['Abstract'] = data['Abstract']+line.strip()
+		print("IN abstract")
+		data['Abstract'] = data['Abstract']+str(line.strip())
 
 #sortie.write('\n')
 #sortie.close()
