@@ -18,7 +18,7 @@ lines = pdf.readlines()
 # recuperer le titre
 
 sortie.write("Title: \n")
-sortie.write(lines[0].strip()+'\n')
+sortie.write((lines[0].strip('\n')+" "+lines[1])+'\n')
 
 
 # recuperer l'abstract
