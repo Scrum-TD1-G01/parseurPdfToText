@@ -52,22 +52,35 @@ sortie.write("\n")
 
 
 # recuperer l'abstract
-sortie.write("Abstract: \n")
+sortie.write("Abstract : \n")
+abstractDone = False
 
 copy = False
 for line in lines:
-	if str("Abstract\n") in line:
-		copy = True
-	elif str("ABSTRACT\n") in line:
-		copy = True
-	elif str("1\n") in line:
-		copy = False
-	elif str("I.\n") in line:
-		copy = False
-	elif str("1.\n") in line:
-		copy = False
-	elif copy:
-		sortie.write(line.strip())
+
+        if(abstractDone!=True):
+                if str("Abstract\n") in line:
+                        copy = True
+                elif str("ABSTRACT\n") in line:
+                        copy = True
+                elif str("1\n") in line:
+                        copy = False
+                        abstractDone = True
+                elif str("I.\n") in line:
+                        copy = False
+                        abstractDone = True
+                elif str("1.\n") in line:
+                        copy = False
+                        abstractDone = True
+                elif copy:
+                        sortie.write(line.strip())
+        elif (abstractDone):
+                if str("References\n") in line:
+                        copy = True
+                        sortie.write("\n")
+                        sortie.write("References : \n")
+                elif copy:
+                        sortie.write(line.strip())
 
 sortie.write('\n')
 sortie.close()
