@@ -26,7 +26,9 @@ if (len(sys.argv) > 2):
 # Dictionnaire data
 data = {'fileName' : "",
 		'abstract' : "123",
-		'title' : ""
+		'title' : "",
+		'author' : "",
+		'biblio' : ""		
 		}
 
 # Convert pdf
@@ -38,13 +40,17 @@ lines = pdf.readlines()
 root = Element('opml')
 root.set('version','1.0')
 head = SubElement(root, 'article')
+preamble = SubElement(head, 'preamble')
 title = SubElement(head, 'title')
 auteur = SubElement(head, 'auteur')
 abstract = SubElement(head, 'abstract')
 biblio = SubElement(head, 'biblio')
-print (prettify(root))
+#print (prettify(root))
 # recuperer le pdf source
-sortie = open(sys.argv[2]+"_parser.txt","w")  # delete le dernier fichier si il existe
+if(exportFormat == "txt"):
+	sortie = open(sys.argv[1]+"_parser.txt","w")  # delete le dernier fichier si il existe
+else:
+	sortie = open(sys.argv[1]+"_parser.xml","w")  # delete le dernier fichier si il existe
 #sortie.write("Fichier Original: \n"+"    "+sys.argv[1]+"\n")
 data['fileName'] = sys.argv[1]
 
@@ -54,26 +60,26 @@ data['fileName'] = sys.argv[1]
 raw_pdf = open(sys.argv[1],'rb')#recuperer le pdf raw pour extract les metadata
 parser = PDFParser(raw_pdf)
 doc = PDFDocument(parser)#cast le PDF en doc dans notre code
-sortie.write("Title: \n")
+#sortie.write("Title: \n")
 
 if(doc.info[0]['Title']):
 	try:
 		#sortie.write(doc.info[0]['Title'].decode("utf-16"))
 		data['title'] = doc.info[0]['Title'].decode("utf-16")
 	except UnicodeDecodeError:
-		sortie.write(str(doc.info[0]['Title']))
-		#data['title'] = str(doc.info[0]['Title'])
+		#sortie.write(str(doc.info[0]['Title']))
+		data['title'] = str(doc.info[0]['Title'])
 else:
-	sortie.write(lines[0].strip()+'\n')
-	#data['title'] = lines[0].strip()+'\n'
+	#sortie.write(lines[0].strip()+'\n')
+	data['title'] = lines[0].strip()+'\n'
 
-sortie.write("\n")
+
 
 
 
 
 # recuperer l'abstract
-sortie.write("<auteur>")
+#sortie.write("<auteur>")
 
 copy = False
 cpt = 0
@@ -82,38 +88,51 @@ for line in lines:
 	if str("Abstract\n") in line:
 		copy = True
 		abstractStart = True
-		sortie.write("</auteur>\n<abstract>")
 	elif str("ABSTRACT\n") in line:
 		copy = True
 		abstractStart = True
-		sortie.write("</auteur>\n<abstract>")
 	elif (cpt > 0 and abstractStart == False):
-		sortie.write(line.strip())
+		data["author"] = data["author"]+line.strip()
 	elif str("1\n") in line:
 		copy = False
-		sortie.write("</abstract>")
 	elif str("I.\n") in line:
 		copy = False
-		sortie.write("</abstract>")
 	elif str("1.\n") in line:
 		copy = False
-		sortie.write("</abstract>")
 	elif copy:
 		#sortie.write(line.strip())
 		data['abstract'] = data['abstract']+str(line.strip())
 	cpt += 1
 
+copy = False
+for line in lines:
+	if str("References\n") in line:
+		copy = True
+	elif copy:
+		data['biblio']=data['biblio']+line.strip()
 if exportFormat == "txt":
 	sortie.write("Preamble : ")
 	sortie.write(data['fileName']+"\n")
 	sortie.write("Title : ")
 	sortie.write(data['title']+"\n")
+	sortie.write("Auteur : ")
+	sortie.write(data['author']+"\n")
 	sortie.write("Abstract : ")
 	sortie.write(data['abstract']+"\n")
-'''
-sortie.write('\n')
+	sortie.write("Biblio : ")
+	sortie.write(data['biblio']+"\n")
+else:
+	preamble.text=data['fileName']
+	title.text=data['title']
+	auteur.text=data["author"]
+	abstract.text=data['abstract']
+	biblio.text=data["biblio"]
+	sortie.write(prettify(root))
+	
+	
+
+
 sortie.close()
 pdf.close()
-'''
 
 
