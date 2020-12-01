@@ -7,10 +7,15 @@ from pdfminer.pdfdocument import PDFDocument
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from xml.dom import minidom
+import xml
 def prettify(elem):
-	rough_string = ElementTree.tostring(elem, 'utf-8')
-	reparsed = minidom.parseString(rough_string)
-	return reparsed.toprettyxml(indent=" ")
+	try:
+		rough_string = ElementTree.tostring(elem, encoding='utf-8')
+		reparsed = minidom.parseString(rough_string)
+		return reparsed.toprettyxml(indent=" ")
+	except xml.parsers.expat.ExpatError:
+		return str(tostring(elem))
+		
 
 
 exportFormat = ""
@@ -40,7 +45,7 @@ data = {'fileName' : "",
 
 # Convert pdf
 os.system("pdftotext -nopgbrk "+sys.argv[1])
-pdf = open(os.path.splitext(sys.argv[1])[0]+'.txt',"r")
+pdf = open(os.path.splitext(sys.argv[1])[0]+'.txt',"r",encoding='utf-8')
 lines = pdf.readlines()
 
 #genereration template xml
