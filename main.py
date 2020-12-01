@@ -11,7 +11,23 @@ def prettify(elem):
 	rough_string = ElementTree.tostring(elem, 'utf-8')
 	reparsed = minidom.parseString(rough_string)
 	return reparsed.toprettyxml(indent=" ")
- 
+
+
+exportFormat = ""
+
+if (len(sys.argv) > 2):
+	if (sys.argv[2] == "-t"):
+		print("export txt")
+		exportFormat = "txt"
+	elif (sys.argv[2] == "-x"):
+		print("export xml")
+		exportFormat = "xml"
+
+# Dictionnaire data
+data = {'fileName' : "",
+		'abstract' : "123",
+		'title' : ""
+		}
 
 # Convert pdf
 os.system("pdftotext -nopgbrk "+sys.argv[1])
@@ -28,8 +44,10 @@ abstract = SubElement(head, 'abstract')
 biblio = SubElement(head, 'biblio')
 print (prettify(root))
 # recuperer le pdf source
-sortie = open(sys.argv[1]+"_parser.txt","w")  # delete le dernier fichier si il existe
-sortie.write("Fichier Original: \n"+"    "+sys.argv[1]+"\n")
+sortie = open(sys.argv[2]+"_parser.txt","w")  # delete le dernier fichier si il existe
+#sortie.write("Fichier Original: \n"+"    "+sys.argv[1]+"\n")
+data['fileName'] = sys.argv[1]
+
 
 
 #recuperer les metadata et title
@@ -40,11 +58,14 @@ sortie.write("Title: \n")
 
 if(doc.info[0]['Title']):
 	try:
-		sortie.write(doc.info[0]['Title'].decode("utf-16"))
+		#sortie.write(doc.info[0]['Title'].decode("utf-16"))
+		data['title'] = doc.info[0]['Title'].decode("utf-16")
 	except UnicodeDecodeError:
 		sortie.write(str(doc.info[0]['Title']))
+		#data['title'] = str(doc.info[0]['Title'])
 else:
 	sortie.write(lines[0].strip()+'\n')
+	#data['title'] = lines[0].strip()+'\n'
 
 sortie.write("\n")
 
@@ -78,11 +99,21 @@ for line in lines:
 		copy = False
 		sortie.write("</abstract>")
 	elif copy:
-		sortie.write(line.strip())
+		#sortie.write(line.strip())
+		data['abstract'] = data['abstract']+str(line.strip())
 	cpt += 1
 
+if exportFormat == "txt":
+	sortie.write("Preamble : ")
+	sortie.write(data['fileName']+"\n")
+	sortie.write("Title : ")
+	sortie.write(data['title']+"\n")
+	sortie.write("Abstract : ")
+	sortie.write(data['abstract']+"\n")
+'''
 sortie.write('\n')
 sortie.close()
 pdf.close()
+'''
 
 
