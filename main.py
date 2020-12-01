@@ -124,14 +124,23 @@ for line in lines:
 	elif str("ABSTRACT\n") in line:
 		copy = True
 		abstractStart = True
-	elif (cpt > 0 and abstractStart == False):
-		data["author"] = data["author"]+line.strip()
 	elif str("1\n") in line:
 		copy = False
 	elif str("I.\n") in line:
 		copy = False
 	elif str("1.\n") in line:
 		copy = False
+	elif str("1. Introduction") in line:
+		copy = False
+		abstractStart = True
+	elif str("1 Introduction") in line:
+		copy = False
+		abstractStart = True
+	elif str("I. Introduction") in line:
+		copy = False
+		abstractStart = True
+	elif (cpt > 0 and abstractStart == False):
+		data["author"] = data["author"]+line.strip()
 	elif copy:
 		#sortie.write(line.strip())
 		data['abstract'] = data['abstract']+str(line.strip())
