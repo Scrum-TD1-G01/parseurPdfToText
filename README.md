@@ -1,6 +1,6 @@
 # parseurPdfToText
 
-## V1 : Capable de récupérer le titre, l'abstract et le nom du fichier d'origine
+## V2 : Capable de récupérer : nom du fichier d'origine, titre, auteurs, abstract, biblio
 
 Pour executer le programme : `python3 ./main.py pdfFilePath`
 
