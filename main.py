@@ -2,6 +2,7 @@ import pdftotext
 import sys
 import unicodedata
 import os
+import glob
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from xml.etree import ElementTree
@@ -16,14 +17,14 @@ def prettify(elem):
 exportFormat = ""
 
 if (len(sys.argv) > 2):
-	if (sys.argv[2] == "-t"):
+	if (sys.argv[1] == "-t"):
 		print("export txt")
 		exportFormat = "txt"
-	elif (sys.argv[2] == "-x"):
+	elif (sys.argv[1] == "-x"):
 		print("export xml")
 		exportFormat = "xml"
 	else:
-		raise Exception("Erreur parametre non reconnus (" + str(sys.argv[2]) + ")")
+		raise Exception("Erreur parametre non reconnus (" + str(sys.argv[1]) + ")")
 		exit(1)
 else:
 	raise Exception("Pas assez de parametre fournis")
@@ -35,12 +36,34 @@ data = {'fileName' : "",
 		'abstract' : "",
 		'title' : "",
 		'author' : "",
-		'biblio' : ""		
-		}
+		'biblio' : ""
+	}
+
+
+dirPath = sys.argv[2]
+print(dirPath)
+if os.path.isdir(dirPath):
+	fileList = glob.glob(dirPath+'**.pdf')
+	fileListKey = []
+	fileListDic = {}
+	for i in fileList:
+		fileListKey.append(os.path.basename(i))
+		fileListDic[fileListKey[-1]] = i
+	
+	for i in range(len(fileListDic)):
+		print(str(i)+" :", fileListKey[i])
+else:
+	raise Exception("Le dossier (" + dirPath + ") n'existe pas")
+resFileToParse = int(input("Saisir le numero du pdf à parser : "))
+data['fileName'] = fileListKey[resFileToParse]
+print("Parsing du document :", fileListKey[resFileToParse])
+fileToParse = fileListDic[fileListKey[resFileToParse]]
+print("Adresse du document :", fileToParse)
+
 
 # Convert pdf
-os.system("pdftotext -nopgbrk "+sys.argv[1])
-pdf = open(os.path.splitext(sys.argv[1])[0]+'.txt',"r")
+os.system("pdftotext -nopgbrk "+fileToParse)
+pdf = open(os.path.splitext(fileToParse)[0]+'.txt',"r")
 lines = pdf.readlines()
 
 #genereration template xml
@@ -55,16 +78,14 @@ biblio = SubElement(head, 'biblio')
 #print (prettify(root))
 # recuperer le pdf source
 if(exportFormat == "txt"):
-	sortie = open(sys.argv[1]+"_parser.txt","w")  # delete le dernier fichier si il existe
+	sortie = open(fileToParse+"_parser.txt","w")  # delete le dernier fichier si il existe
 else:
-	sortie = open(sys.argv[1]+"_parser.xml","w")  # delete le dernier fichier si il existe
-#sortie.write("Fichier Original: \n"+"    "+sys.argv[1]+"\n")
-data['fileName'] = sys.argv[1]
+	sortie = open(fileToParse+"_parser.xml","w")  # delete le dernier fichier si il existe
 
 
 
 #recuperer les metadata et title
-raw_pdf = open(sys.argv[1],'rb')#recuperer le pdf raw pour extract les metadata
+raw_pdf = open(fileToParse,'rb')#recuperer le pdf raw pour extract les metadata
 parser = PDFParser(raw_pdf)
 doc = PDFDocument(parser)#cast le PDF en doc dans notre code
 #sortie.write("Title: \n")
