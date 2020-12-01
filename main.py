@@ -22,6 +22,12 @@ if (len(sys.argv) > 2):
 	elif (sys.argv[2] == "-x"):
 		print("export xml")
 		exportFormat = "xml"
+	else:
+		print("Erreur parametre non reconnus:",sys.argv[2])
+		exit(1)
+else:
+	print("Pas asser de parametre fournis")
+	exit(1)
 
 # Dictionnaire data
 data = {'fileName' : "",
