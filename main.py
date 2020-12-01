@@ -23,10 +23,10 @@ if (len(sys.argv) > 2):
 		print("export xml")
 		exportFormat = "xml"
 	else:
-		print("Erreur parametre non reconnus:",sys.argv[2])
+		raise Exception("Erreur parametre non reconnus (" + str(sys.argv[2]) + ")")
 		exit(1)
 else:
-	print("Pas asser de parametre fournis")
+	raise Exception("Pas assez de parametre fournis")
 	exit(1)
 
 # Dictionnaire data
