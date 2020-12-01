@@ -52,35 +52,34 @@ sortie.write("\n")
 
 
 # recuperer l'abstract
-sortie.write("Abstract : \n")
-abstractDone = False
+sortie.write("<auteur>")
 
 copy = False
+cpt = 0
+abstractStart = False
 for line in lines:
-
-        if(abstractDone!=True):
-                if str("Abstract\n") in line:
-                        copy = True
-                elif str("ABSTRACT\n") in line:
-                        copy = True
-                elif str("1\n") in line:
-                        copy = False
-                        abstractDone = True
-                elif str("I.\n") in line:
-                        copy = False
-                        abstractDone = True
-                elif str("1.\n") in line:
-                        copy = False
-                        abstractDone = True
-                elif copy:
-                        sortie.write(line.strip())
-        elif (abstractDone):
-                if str("References\n") in line:
-                        copy = True
-                        sortie.write("\n")
-                        sortie.write("References : \n")
-                elif copy:
-                        sortie.write(line.strip())
+	if str("Abstract\n") in line:
+		copy = True
+		abstractStart = True
+		sortie.write("</auteur>\n<abstract>")
+	elif str("ABSTRACT\n") in line:
+		copy = True
+		abstractStart = True
+		sortie.write("</auteur>\n<abstract>")
+	elif (cpt > 0 and abstractStart == False):
+		sortie.write(line.strip())
+	elif str("1\n") in line:
+		copy = False
+		sortie.write("</abstract>")
+	elif str("I.\n") in line:
+		copy = False
+		sortie.write("</abstract>")
+	elif str("1.\n") in line:
+		copy = False
+		sortie.write("</abstract>")
+	elif copy:
+		sortie.write(line.strip())
+	cpt += 1
 
 sortie.write('\n')
 sortie.close()
