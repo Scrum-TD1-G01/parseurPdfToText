@@ -29,6 +29,7 @@ else:
 	raise Exception("Pas assez de parametre fournis")
 	exit(1)
 
+
 # Dictionnaire data
 data = {'fileName' : "",
 		'abstract' : "",
