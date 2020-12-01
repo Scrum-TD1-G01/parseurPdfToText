@@ -25,7 +25,7 @@ if (len(sys.argv) > 2):
 
 # Dictionnaire data
 data = {'fileName' : "",
-		'abstract' : "123",
+		'abstract' : "",
 		'title' : "",
 		'author' : "",
 		'biblio' : ""		
