@@ -43,7 +43,8 @@ data = {'fileName' : "",
 		'author' : "",
 		'biblio' : "",
 		'discussion' : "",
-		'conclusion' : ""
+		'conclusion' : "",
+		'introduction': ""
 	}
 
 
@@ -61,7 +62,7 @@ if os.path.isdir(dirPath):
 		print(str(i)+" :", fileListKey[i])
 else:
 	raise Exception("Le dossier (" + dirPath + ") n'existe pas")
-resFileToParse = int(input("Saisir le numero du pdf à parser : "))
+resFileToParse = int(input("Saisir le numero du pdf a parser : "))
 data['fileName'] = fileListKey[resFileToParse]
 print("Parsing du document :", fileListKey[resFileToParse])
 fileToParse = fileListDic[fileListKey[resFileToParse]]
@@ -97,7 +98,7 @@ raw_pdf = open(fileToParse,'rb')#recuperer le pdf raw pour extract les metadata
 parser = PDFParser(raw_pdf)
 doc = PDFDocument(parser)#cast le PDF en doc dans notre code
 #sortie.write("Title: \n")
-
+authorinhtml = False
 if(doc.info[0]['Title']):
 	try:
 		#sortie.write(doc.info[0]['Title'].decode("utf-16"))
@@ -108,6 +109,19 @@ if(doc.info[0]['Title']):
 else:
 	#sortie.write(lines[0].strip()+'\n')
 	data['title'] = lines[0].strip()+'\n'
+
+if(doc.info[0]['Author']):
+	authorinhtml = False
+	try:
+		#sortie.write(doc.info[0]['Title'].decode("utf-16"))
+		data['auteur'] = doc.info[0]['Author'].decode("utf-16")
+	except UnicodeDecodeError:
+		#sortie.write(str(doc.info[0]['Title']))
+		data['auteur'] = str(doc.info[0]['Author'])
+else:
+	#sortie.write(lines[0].strip()+'\n')
+	data['auteur'] = lines[0].strip()+'\n'
+
 
 
 
@@ -120,6 +134,7 @@ else:
 copy = False
 cpt = 0
 abstractStart = False
+introStart = False
 for line in lines:
 	if str("Abstract\n") in line:
 		copy = True
@@ -135,18 +150,20 @@ for line in lines:
 		copy = False
 	elif str("1. Introduction") in line:
 		copy = False
-		abstractStart = True
+		introStart = True
 	elif str("1 Introduction") in line:
 		copy = False
-		abstractStart = True
+		introStart = True
 	elif str("I. Introduction") in line:
 		copy = False
-		abstractStart = True
-	elif (cpt > 0 and abstractStart == False):
+		introStart = True
+	elif (cpt > 0 and abstractStart == False and authorinhtml == False):
 		data["author"] = data["author"]+line.strip()
 	elif copy:
 		#sortie.write(line.strip())
 		data['abstract'] = data['abstract']+str(line.strip())
+	elif introStart:
+		data['introduction'] = data['introduction']+str(line.strip())
 	cpt += 1
 
 
