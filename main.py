@@ -83,6 +83,7 @@ preamble = SubElement(head, 'preamble')
 title = SubElement(head, 'title')
 auteur = SubElement(head, 'auteur')
 abstract = SubElement(head, 'abstract')
+introduction = SubElement(head, 'introduction')
 conclusion = SubElement(head, 'conclusion')
 biblio = SubElement(head, 'biblio')
 #print (prettify(root))
@@ -155,21 +156,17 @@ for line in lines:
 		copy = False
 	elif str("1.\n") in line:
 		copy = False
-	elif str("1. Introduction") in line:
+	elif reg.match(r'^.{0,5}introduction[\.|\ |\n]', line.lower()):
 		copy = False
 		introStart = True
-	elif str("1 Introduction") in line:
-		copy = False
-		introStart = True
-	elif str("I. Introduction") in line:
-		copy = False
-		introStart = True
+	elif str("2\n") in line:
+		introStart = False
 	elif (cpt > 0 and abstractStart == False and authorinhtml == False):
 		data["author"] = data["author"]+line.strip()
-	elif copy:
+	if copy:
 		#sortie.write(line.strip())
 		data['abstract'] = data['abstract']+str(line.strip())
-	elif introStart:
+	if introStart:
 		data['introduction'] = data['introduction']+str(line.strip())
 	cpt += 1
 
@@ -212,6 +209,8 @@ if exportFormat == "txt":
 	sortie.write(data['author']+"\n")
 	sortie.write("Abstract : ")
 	sortie.write(data['abstract']+"\n")
+	sortie.write("Introduction : ")
+	sortie.write(data['introduction']+"\n")
 	sortie.write("Conclusion : ")
 	sortie.write(data['conclusion']+"\n")
 	sortie.write("Discussion : ")
@@ -223,6 +222,7 @@ else:
 	title.text=data['title']
 	auteur.text=data["author"]
 	abstract.text=data['abstract']
+	introduction.text=data['introduction']
 	biblio.text=data["conclusion"]
 	biblio.text=data["biblio"]
 	sortie.write(prettify(root))
