@@ -41,7 +41,8 @@ data = {'fileName' : "",
 		'abstract' : "",
 		'title' : "",
 		'author' : "",
-		'biblio' : ""
+		'biblio' : "",
+		'conclusion' : ""
 	}
 
 
@@ -79,6 +80,7 @@ preamble = SubElement(head, 'preamble')
 title = SubElement(head, 'title')
 auteur = SubElement(head, 'auteur')
 abstract = SubElement(head, 'abstract')
+conclusion = SubElement(head, 'conclusion')
 biblio = SubElement(head, 'biblio')
 #print (prettify(root))
 # recuperer le pdf source
@@ -148,10 +150,21 @@ for line in lines:
 
 copy = False
 for line in lines:
+	if str("Conclusion\n") in line:
+		copy = True
+	elif str("References\n") in line:
+		copy = False
+	elif copy:
+		data['conclusion']=data['conclusion']+line.strip()
+
+copy = False
+for line in lines:
 	if str("References\n") in line:
 		copy = True
 	elif copy:
 		data['biblio']=data['biblio']+line.strip()
+
+
 if exportFormat == "txt":
 	sortie.write("Preamble : ")
 	sortie.write(data['fileName']+"\n")
@@ -161,6 +174,8 @@ if exportFormat == "txt":
 	sortie.write(data['author']+"\n")
 	sortie.write("Abstract : ")
 	sortie.write(data['abstract']+"\n")
+	sortie.write("Conclusion : ")
+	sortie.write(data['conclusion']+"\n")
 	sortie.write("Biblio : ")
 	sortie.write(data['biblio']+"\n")
 else:
@@ -168,6 +183,7 @@ else:
 	title.text=data['title']
 	auteur.text=data["author"]
 	abstract.text=data['abstract']
+	biblio.text=data["conclusion"]
 	biblio.text=data["biblio"]
 	sortie.write(prettify(root))
 	
