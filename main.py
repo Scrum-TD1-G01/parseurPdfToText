@@ -42,6 +42,7 @@ data = {'fileName' : "",
 		'title' : "",
 		'author' : "",
 		'biblio' : "",
+		'discussion' : "",
 		'conclusion' : ""
 	}
 
@@ -148,22 +149,35 @@ for line in lines:
 		data['abstract'] = data['abstract']+str(line.strip())
 	cpt += 1
 
+
 copy = False
 for line in lines:
-	if str("Conclusion\n") in line:
+	if str("Conclusion\n") in line or str("CONCLUSIONS\n") in line:
 		copy = True
 	elif str("References\n") in line:
 		copy = False
 	elif copy:
 		data['conclusion']=data['conclusion']+line.strip()
 
-copy = False
-for line in lines:
-	if str("References\n") in line:
-		copy = True
-	elif copy:
-		data['biblio']=data['biblio']+line.strip()
 
+
+copy = False
+discussion = False
+for line in lines:
+	if str("Discussion\n" or "DISCUSSION\n") in line:
+		discussion = True
+	elif str("Conclusion\n" or "Conclusions\n" or "CONCLUSIONS\n" or "CONCLUSION\n") in line:
+		copy = True
+		discussion = False
+	elif str("References\n") in line:
+		copy = False
+		discussion = False
+	elif str("Appendix") in line :
+		discussion = False
+	elif discussion:
+		data['discussion']=data['discussion']+line.strip()
+	elif copy:
+		data['conclusion']=data['conclusion']+line.strip()
 
 if exportFormat == "txt":
 	sortie.write("Preamble : ")
@@ -176,6 +190,8 @@ if exportFormat == "txt":
 	sortie.write(data['abstract']+"\n")
 	sortie.write("Conclusion : ")
 	sortie.write(data['conclusion']+"\n")
+	sortie.write("Discussion : ")
+	sortie.write(data['discussion']+"\n")
 	sortie.write("Biblio : ")
 	sortie.write(data['biblio']+"\n")
 else:
