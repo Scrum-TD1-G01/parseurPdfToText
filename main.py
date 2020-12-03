@@ -134,33 +134,34 @@ copy = ''  # La section en cours de copie ('' : aucune)
 cpt = 0
 for line in lines:
 	# Abstract
-	if reg.match(r'^.{0,5}abstract[\.|\ |\n]', line.lower()) and not 'abstract' in copied:
+	if reg.match(r'^.{0,5}abstract(s)?[\.|\ |\n]', line.lower()) and not 'abstract' in copied:
 		print(line)
 		copy = 'abstract'
 		copied.append(copy)
 	# Fin Abstract
 	elif str("1.\n") in line or str("I.\n") in line or str("1.\n") in line:
+		#elif 'abstract' in copied and reg.match(r'^[1|i|I](.)+\n', line.lower()):
 		copy = ''
 	# Introduction
-	elif reg.match(r'^.{0,5}introduction[\.|\ |\n]', line.lower()) and not 'introduction' in copied:
+	elif reg.match(r'^.{0,5}introduction(s)?[\.|\ |\n]', line.lower()) and not 'introduction' in copied:
 		copy = 'introduction'
 		copied.append(copy)
 	# Fin Introduction
 	elif reg.match(r'^2[\.|\ .+|\n]', line.lower()):
 		copy = ''
 	# Conclusion
-	elif reg.match(r'^.{0,5}conclusion[\.|\ |\n]', line.lower()) and not 'conclusion' in copied:
+	elif reg.match(r'^.{0,10}conclusion(s)?[\.|\ |\n]', line.lower()) and not 'conclusion' in copied:  # 'summary' pose problème
 		copy = 'conclusion'
 		copied.append(copy)
-	# Fin FACULTATIVE pour Conclusion
-	elif reg.match(r'^.{0,5}acknowledgements[\.|\ |\n]', line.lower()):
+	# Fin FACULTATIVE
+	elif reg.match(r'^.{0,5}acknowledg(e)?ment(s)?', line.lower()):
 		copy = ''
 	# Références bibliographiques (et = fin discussion)
-	elif reg.match(r'^.{0,5}reference(s)[\.|\ |\n]', line.lower()) and not 'biblio' in copied:
+	elif reg.match(r'^.{1,5}reference(s)?[\.|\ |\n]', line.lower()) and not 'biblio' in copied:  # !!! {1,..}
 		copy = 'biblio'
 		copied.append(copy)
 	# Discussion
-	elif reg.match(r'^.{0,5}discussion[\.|\ |\n]', line.lower()) and not 'discussion' in copied:
+	elif reg.match(r'^.{0,3}discussion(s)?[\.|\ |\n]', line.lower()) and not 'discussion' in copied:  # !!! {..,3}
 		copy = 'discussion'
 		copied.append(copy)
 	# Auteurs
