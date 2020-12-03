@@ -3,6 +3,7 @@ import sys
 import unicodedata
 import os
 import glob
+import regex as reg
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from xml.etree import ElementTree
@@ -99,7 +100,7 @@ parser = PDFParser(raw_pdf)
 doc = PDFDocument(parser)#cast le PDF en doc dans notre code
 #sortie.write("Title: \n")
 authorinhtml = False
-if(doc.info[0]['Title']):
+if(doc.info[0] and doc.info[0]['Title']):
 	try:
 		#sortie.write(doc.info[0]['Title'].decode("utf-16"))
 		data['title'] = doc.info[0]['Title'].decode("utf-16")
@@ -136,10 +137,16 @@ cpt = 0
 abstractStart = False
 introStart = False
 for line in lines:
+	'''
 	if str("Abstract\n") in line:
 		copy = True
 		abstractStart = True
 	elif str("ABSTRACT\n") in line:
+		copy = True
+		abstractStart = True
+	'''
+	if reg.match(r'^.{0,5}abstract[\.|\ |\n]', line.lower()):
+		print(line)
 		copy = True
 		abstractStart = True
 	elif str("1\n") in line:
