@@ -85,6 +85,7 @@ auteur = SubElement(head, 'auteur')
 abstract = SubElement(head, 'abstract')
 introduction = SubElement(head, 'introduction')
 conclusion = SubElement(head, 'conclusion')
+discusion = SubElement(head, 'discussion')
 biblio = SubElement(head, 'biblio')
 #print (prettify(root))
 # recuperer le pdf source
@@ -139,6 +140,7 @@ abstractStart = False
 introStart = False
 conclusionStart = False
 referenceStart =  False
+discussionStart = False
 for line in lines:
 	'''
 	if str("Abstract\n") in line:
@@ -167,7 +169,10 @@ for line in lines:
 		conclusionStart = True
 	elif reg.match(r'^.{0,5}reference(s)[\.|\ |\n]', line.lower()):
 		referenceStart = True
-	elif (cpt > 0 and abstractStart == False and authorinhtml == False):
+		discussionStart = False
+	elif reg.match(r'^.{0,5}discussion[\.|\ |\n]', line.lower()):
+		discussionStart = True
+	if (cpt > 0 and abstractStart == False and authorinhtml == False):
 		data["author"] = data["author"]+line.strip()
 	if copy:
 		#sortie.write(line.strip())
@@ -178,25 +183,9 @@ for line in lines:
 		data['conclusion']=data['conclusion']+line.strip()
 	if referenceStart:
 		data['biblio']=data['biblio']+line.strip()
-	cpt += 1
-
-copy = False
-discussion = False
-for line in lines:
-	if str("Discussion\n" or "DISCUSSION\n") in line:
-		discussion = True
-	elif str("Conclusion\n" or "Conclusions\n" or "CONCLUSIONS\n" or "CONCLUSION\n") in line:
-		copy = True
-		discussion = False
-	elif str("References\n") in line:
-		copy = False
-		discussion = False
-	elif str("Appendix") in line :
-		discussion = False
-	elif discussion:
+	if discussionStart:
 		data['discussion']=data['discussion']+line.strip()
-	elif copy:
-		data['conclusion']=data['conclusion']+line.strip()
+	cpt += 1
 
 if exportFormat == "txt":
 	sortie.write("Preamble : ")
@@ -223,6 +212,7 @@ else:
 	introduction.text=data['introduction']
 	conclusion.text=data["conclusion"]
 	biblio.text=data["biblio"]
+	discusion.text=data['discussion']
 	sortie.write(prettify(root))
 	
 	
