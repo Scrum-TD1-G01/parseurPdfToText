@@ -74,8 +74,8 @@ print("Chemin du document :", fileToParse)
 
 
 # Convert pdf
-#os.system("pdftotext -nopgbrk -raw "+fileToParse)
-os.system("pdftotext -nopgbrk "+fileToParse)
+os.system("pdftotext -nopgbrk -raw "+fileToParse)
+#os.system("pdftotext -nopgbrk "+fileToParse)
 pdf = open(os.path.splitext(fileToParse)[0]+'.txt',"r")
 lines = pdf.readlines()
 
@@ -146,7 +146,7 @@ for line in lines:
 		copy = 'introduction'
 		copied.append(copy)
 	# Fin Introduction
-	elif str("2\n") in line:
+	elif reg.match(r'^2[\.|\ .+|\n]', line.lower()):
 		copy = ''
 	# Conclusion
 	elif reg.match(r'^.{0,5}conclusion[\.|\ |\n]', line.lower()) and not 'conclusion' in copied:
@@ -171,6 +171,9 @@ for line in lines:
 		data['author'] = data['author']+line.strip()
 		copy = 'author'
 		copied.append('author')
+	# Copie de bilio jusqu'à la fin du document (dernier element du doc : on en sort plus)
+	if 'biblio' in copied:
+		copy = 'biblio'
 	if copy != '':
 		data[copy] = data[copy]+str(line.strip())
 	cpt += 1
