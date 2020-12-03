@@ -74,7 +74,7 @@ print("Chemin du document :", fileToParse)
 
 
 # Convert pdf
-os.system("pdftotext -nopgbrk "+fileToParse)
+os.system("pdftotext -nopgbrk -raw "+fileToParse)
 pdf = open(os.path.splitext(fileToParse)[0]+'.txt',"r")
 lines = pdf.readlines()
 
@@ -119,9 +119,9 @@ try:
 	if(doc.info[0]['Author']):
 		copied.append('auteur')  # authorinhtml = True
 		try:
-			data['auteur'] = doc.info[0]['Author'].decode("utf-16")
+			data['author'] = doc.info[0]['Author'].decode("utf-16")
 		except UnicodeDecodeError:
-			data['auteur'] = str(doc.info[0]['Author'])
+			data['author'] = str(doc.info[0]['Author'])
 except:
 	a = 0  # do nothing
 
@@ -138,7 +138,7 @@ for line in lines:
 		copy = 'abstract'
 		copied.append(copy)
 	# Fin Abstract
-	elif str("1\n") in line or str("I.\n") in line or str("1.\n") in line:
+	elif str("1.\n") in line or str("I.\n") in line or str("1.\n") in line:
 		copy = ''
 	# Introduction
 	elif reg.match(r'^.{0,5}introduction[\.|\ |\n]', line.lower()) and not 'introduction' in copied:
@@ -160,8 +160,10 @@ for line in lines:
 		copy = 'discussion'
 		copied.append(copy)
 	# Auteurs
-	if cpt > 0 and cpt < 200 and copy == '' and not line.strip() in data['author'] and not 'author' in copied:
-		# not line.strip() data['author'] : si on est pas encore dans le titre
+	if cpt > 0 and cpt < 200 and copy == '' and not line.strip() in data['title'] and not 'author' in copied:
+		# not line.strip() data['title'] : si on est pas encore dans le titre
+		if cpt == 1:
+			print(line.strip())
 		data['author'] = data['author']+line.strip()
 		copied.append(copy)
 	if copy != '':
