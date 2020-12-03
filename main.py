@@ -19,7 +19,7 @@ def prettify(elem):
 		return str(tostring(elem))
 		
 
-
+# Verification des arguments
 exportFormat = ""
 
 if (len(sys.argv) > 2):
@@ -49,6 +49,7 @@ data = {'fileName' : "",
 	}
 
 
+# Menu de selection
 dirPath = sys.argv[2]
 print(dirPath)
 if os.path.isdir(dirPath):
@@ -67,7 +68,7 @@ resFileToParse = int(input("Saisir le numero du pdf a parser : "))
 data['fileName'] = fileListKey[resFileToParse]
 print("Parsing du document :", fileListKey[resFileToParse])
 fileToParse = fileListDic[fileListKey[resFileToParse]]
-print("Adresse du document :", fileToParse)
+print("Chemin du document :", fileToParse)
 
 
 # Convert pdf
@@ -100,39 +101,28 @@ else:
 raw_pdf = open(fileToParse,'rb')#recuperer le pdf raw pour extract les metadata
 parser = PDFParser(raw_pdf)
 doc = PDFDocument(parser)#cast le PDF en doc dans notre code
-#sortie.write("Title: \n")
+
+
 authorinhtml = False
 if(doc.info[0] and doc.info[0]['Title']):
 	try:
-		#sortie.write(doc.info[0]['Title'].decode("utf-16"))
 		data['title'] = doc.info[0]['Title'].decode("utf-16")
 	except UnicodeDecodeError:
-		#sortie.write(str(doc.info[0]['Title']))
 		data['title'] = str(doc.info[0]['Title'])
 else:
-	#sortie.write(lines[0].strip()+'\n')
 	data['title'] = lines[0].strip()+'\n'
 
 if(doc.info[0]['Author']):
 	authorinhtml = False
 	try:
-		#sortie.write(doc.info[0]['Title'].decode("utf-16"))
 		data['auteur'] = doc.info[0]['Author'].decode("utf-16")
 	except UnicodeDecodeError:
-		#sortie.write(str(doc.info[0]['Title']))
 		data['auteur'] = str(doc.info[0]['Author'])
 else:
-	#sortie.write(lines[0].strip()+'\n')
 	data['auteur'] = lines[0].strip()+'\n'
 
 
-
-
-
-
-
-# recuperer l'abstract
-#sortie.write("<auteur>")
+# Récupération des données
 
 copy = False
 cpt = 0
@@ -142,14 +132,6 @@ conclusionStart = False
 referenceStart =  False
 discussionStart = False
 for line in lines:
-	'''
-	if str("Abstract\n") in line:
-		copy = True
-		abstractStart = True
-	elif str("ABSTRACT\n") in line:
-		copy = True
-		abstractStart = True
-	'''
 	if reg.match(r'^.{0,5}abstract[\.|\ |\n]', line.lower()):
 		print(line)
 		copy = True
@@ -175,7 +157,6 @@ for line in lines:
 	if (cpt > 0 and abstractStart == False and authorinhtml == False):
 		data["author"] = data["author"]+line.strip()
 	if copy:
-		#sortie.write(line.strip())
 		data['abstract'] = data['abstract']+str(line.strip())
 	if introStart:
 		data['introduction'] = data['introduction']+str(line.strip())
@@ -187,6 +168,8 @@ for line in lines:
 		data['discussion']=data['discussion']+line.strip()
 	cpt += 1
 
+
+# Export txt ou xml
 if exportFormat == "txt":
 	sortie.write("Preamble : ")
 	sortie.write(data['fileName']+"\n")
