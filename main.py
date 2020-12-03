@@ -155,7 +155,7 @@ for line in lines:
 	elif reg.match(r'^.{0,5}discussion[\.|\ |\n]', line.lower()):
 		discussionStart = True
 	if (cpt > 0 and abstractStart == False and authorinhtml == False):
-		data["author"] = data["author"]+line.strip()
+		data['author'] = data['author']+line.strip()
 	if copy:
 		data['abstract'] = data['abstract']+str(line.strip())
 	if introStart:
@@ -190,11 +190,11 @@ if exportFormat == "txt":
 else:
 	preamble.text=data['fileName']
 	title.text=data['title']
-	auteur.text=data["author"]
+	auteur.text=data['author']
 	abstract.text=data['abstract']
 	introduction.text=data['introduction']
-	conclusion.text=data["conclusion"]
-	biblio.text=data["biblio"]
+	conclusion.text=data['conclusion']
+	biblio.text=data['biblio']
 	discusion.text=data['discussion']
 	sortie.write(prettify(root))
 	
