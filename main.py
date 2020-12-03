@@ -137,6 +137,7 @@ copy = False
 cpt = 0
 abstractStart = False
 introStart = False
+conclusionStart = False
 for line in lines:
 	'''
 	if str("Abstract\n") in line:
@@ -161,6 +162,8 @@ for line in lines:
 		introStart = True
 	elif str("2\n") in line:
 		introStart = False
+	elif reg.match(r'^.{0,5}conclusion[\.|\ |\n]', line.lower()):
+		conclusionStart = True
 	elif (cpt > 0 and abstractStart == False and authorinhtml == False):
 		data["author"] = data["author"]+line.strip()
 	if copy:
@@ -168,19 +171,9 @@ for line in lines:
 		data['abstract'] = data['abstract']+str(line.strip())
 	if introStart:
 		data['introduction'] = data['introduction']+str(line.strip())
-	cpt += 1
-
-
-copy = False
-for line in lines:
-	if str("Conclusion\n") in line or str("CONCLUSIONS\n") in line:
-		copy = True
-	elif str("References\n") in line:
-		copy = False
-	elif copy:
+	if conclusionStart:
 		data['conclusion']=data['conclusion']+line.strip()
-
-
+	cpt += 1
 
 copy = False
 discussion = False
@@ -223,7 +216,7 @@ else:
 	auteur.text=data["author"]
 	abstract.text=data['abstract']
 	introduction.text=data['introduction']
-	biblio.text=data["conclusion"]
+	conclusion.text=data["conclusion"]
 	biblio.text=data["biblio"]
 	sortie.write(prettify(root))
 	
