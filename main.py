@@ -48,6 +48,8 @@ data = {'fileName' : "",
 		'introduction': ""
 	}
 
+copied = []
+
 
 # Menu de selection
 dirPath = sys.argv[2]
@@ -97,13 +99,12 @@ else:
 
 
 
-# recuperer les metadata et title
+# recuperer les metadata (titre + auteur))
 raw_pdf = open(fileToParse,'rb')#recuperer le pdf raw pour extract les metadata
 parser = PDFParser(raw_pdf)
 doc = PDFDocument(parser)#cast le PDF en doc dans notre code
 
 
-authorinhtml = False
 if(doc.info[0] and doc.info[0]['Title']):
 	try:
 		data['title'] = doc.info[0]['Title'].decode("utf-16")
@@ -112,62 +113,60 @@ if(doc.info[0] and doc.info[0]['Title']):
 else:
 	data['title'] = lines[0].strip()+'\n'
 
-if(doc.info[0]['Author']):
-	authorinhtml = False
-	try:
-		data['auteur'] = doc.info[0]['Author'].decode("utf-16")
-	except UnicodeDecodeError:
-		data['auteur'] = str(doc.info[0]['Author'])
-else:
-	data['auteur'] = lines[0].strip()+'\n'
+
+# authorinhtml = False  -> pas 'Author' dans copied
+try:
+	if(doc.info[0]['Author']):
+		copied.append('auteur')  # authorinhtml = True
+		try:
+			data['auteur'] = doc.info[0]['Author'].decode("utf-16")
+		except UnicodeDecodeError:
+			data['auteur'] = str(doc.info[0]['Author'])
+except:
+	a = 0  # do nothing
 
 
 # Récupération des données
 
-copy = False
+copy = ''  # La section en cours de copie ('' : aucune)
+# copied = [] (voir début du programme)
 cpt = 0
-abstractStart = False
-introStart = False
-conclusionStart = False
-referenceStart =  False
-discussionStart = False
 for line in lines:
-	if reg.match(r'^.{0,5}abstract[\.|\ |\n]', line.lower()):
+	# Abstract
+	if reg.match(r'^.{0,5}abstract[\.|\ |\n]', line.lower()) and not 'abstract' in copied:
 		print(line)
-		copy = True
-		abstractStart = True
-	elif str("1\n") in line:
-		copy = False
-	elif str("I.\n") in line:
-		copy = False
-	elif str("1.\n") in line:
-		copy = False
-	elif reg.match(r'^.{0,5}introduction[\.|\ |\n]', line.lower()):
-		copy = False
-		introStart = True
+		copy = 'abstract'
+		copied.append(copy)
+	# Fin Abstract
+	elif str("1\n") in line or str("I.\n") in line or str("1.\n") in line:
+		copy = ''
+	# Introduction
+	elif reg.match(r'^.{0,5}introduction[\.|\ |\n]', line.lower()) and not 'introduction' in copied:
+		copy = 'introduction'
+		copied.append(copy)
+	# Fin Introduction
 	elif str("2\n") in line:
-		introStart = False
-	elif reg.match(r'^.{0,5}conclusion[\.|\ |\n]', line.lower()):
-		conclusionStart = True
-	elif reg.match(r'^.{0,5}reference(s)[\.|\ |\n]', line.lower()):
-		referenceStart = True
-		discussionStart = False
-	elif reg.match(r'^.{0,5}discussion[\.|\ |\n]', line.lower()):
-		discussionStart = True
-	if (cpt > 0 and abstractStart == False and authorinhtml == False):
+		copy = ''
+	# Conclusion
+	elif reg.match(r'^.{0,5}conclusion[\.|\ |\n]', line.lower()) and not 'conclusion' in copied:
+		copy = 'conclusion'
+		copied.append(copy)
+	# Références bibliographiques (et = fin discussion)
+	elif reg.match(r'^.{0,5}reference(s)[\.|\ |\n]', line.lower()) and not 'biblio' in copied:
+		copy = 'biblio'
+		copied.append(copy)
+	# Discussion
+	elif reg.match(r'^.{0,5}discussion[\.|\ |\n]', line.lower()) and not 'discussion' in copied:
+		copy = 'discussion'
+		copied.append(copy)
+	# Auteurs
+	if cpt > 0 and cpt < 200 and copy == '' and not line.strip() in data['author'] and not 'author' in copied:
+		# not line.strip() data['author'] : si on est pas encore dans le titre
 		data['author'] = data['author']+line.strip()
-	if copy:
-		data['abstract'] = data['abstract']+str(line.strip())
-	if introStart:
-		data['introduction'] = data['introduction']+str(line.strip())
-	if conclusionStart:
-		data['conclusion']=data['conclusion']+line.strip()
-	if referenceStart:
-		data['biblio']=data['biblio']+line.strip()
-	if discussionStart:
-		data['discussion']=data['discussion']+line.strip()
+		copied.append(copy)
+	if copy != '':
+		data[copy] = data[copy]+str(line.strip())
 	cpt += 1
-
 
 # Export txt ou xml
 if exportFormat == "txt":
@@ -194,8 +193,8 @@ else:
 	abstract.text=data['abstract']
 	introduction.text=data['introduction']
 	conclusion.text=data['conclusion']
-	biblio.text=data['biblio']
 	discusion.text=data['discussion']
+	biblio.text=data['biblio']
 	sortie.write(prettify(root))
 	
 	
