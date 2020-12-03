@@ -74,7 +74,8 @@ print("Chemin du document :", fileToParse)
 
 
 # Convert pdf
-os.system("pdftotext -nopgbrk -raw "+fileToParse)
+#os.system("pdftotext -nopgbrk -raw "+fileToParse)
+os.system("pdftotext -nopgbrk "+fileToParse)
 pdf = open(os.path.splitext(fileToParse)[0]+'.txt',"r")
 lines = pdf.readlines()
 
@@ -151,6 +152,9 @@ for line in lines:
 	elif reg.match(r'^.{0,5}conclusion[\.|\ |\n]', line.lower()) and not 'conclusion' in copied:
 		copy = 'conclusion'
 		copied.append(copy)
+	# Fin FACULTATIVE pour Conclusion
+	elif reg.match(r'^.{0,5}acknowledgements[\.|\ |\n]', line.lower()):
+		copy = ''
 	# Références bibliographiques (et = fin discussion)
 	elif reg.match(r'^.{0,5}reference(s)[\.|\ |\n]', line.lower()) and not 'biblio' in copied:
 		copy = 'biblio'
@@ -160,12 +164,13 @@ for line in lines:
 		copy = 'discussion'
 		copied.append(copy)
 	# Auteurs
-	if cpt > 0 and cpt < 200 and copy == '' and not line.strip() in data['title'] and not 'author' in copied:
+	if cpt > 0 and cpt < 200 and copy == '' and not line.strip() in data['title'] and (copy == 'author' or not 'author' in copied):
 		# not line.strip() data['title'] : si on est pas encore dans le titre
 		if cpt == 1:
 			print(line.strip())
 		data['author'] = data['author']+line.strip()
-		copied.append(copy)
+		copy = 'author'
+		copied.append('author')
 	if copy != '':
 		data[copy] = data[copy]+str(line.strip())
 	cpt += 1
