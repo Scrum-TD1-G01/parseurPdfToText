@@ -76,7 +76,7 @@ os.system("pdftotext -nopgbrk "+fileToParse)
 pdf = open(os.path.splitext(fileToParse)[0]+'.txt',"r")
 lines = pdf.readlines()
 
-#genereration template xml
+# genereration template xml
 root = Element('opml')
 root.set('version','1.0')
 head = SubElement(root, 'article')
@@ -97,7 +97,7 @@ else:
 
 
 
-#recuperer les metadata et title
+# recuperer les metadata et title
 raw_pdf = open(fileToParse,'rb')#recuperer le pdf raw pour extract les metadata
 parser = PDFParser(raw_pdf)
 doc = PDFDocument(parser)#cast le PDF en doc dans notre code
