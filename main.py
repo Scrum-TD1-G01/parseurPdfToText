@@ -190,7 +190,7 @@ for line in lines:
 	if 'biblio' in copied:
 		copy = 'biblio'
 	if copy != '':
-		data[copy] = data[copy]+str(line.strip())
+		data[copy] = data[copy]+str(line.strip())+" "
 	cpt += 1
 
 # Export txt ou xml
