@@ -109,15 +109,18 @@ parser = PDFParser(raw_pdf)
 doc = PDFDocument(parser)#cast le PDF en doc dans notre code
 
 
-if(doc.info[0] and doc.info[0]['Title']):
-	try:
-		data['title'] = doc.info[0]['Title'].decode("utf-16")
-	except UnicodeDecodeError:
-		data['title'] = str(doc.info[0]['Title'])
-else:
+try :
+	if(doc.info[0] and doc.info[0]['Title']):
+		try:
+			data['title'] = doc.info[0]['Title'].decode("utf-16")
+		except UnicodeDecodeError:
+			data['title'] = str(doc.info[0]['Title'])
+	else:
+		data['title'] = lines[0].strip()+'\n'
+except:
 	data['title'] = lines[0].strip()+'\n'
 
-
+'''
 # authorinhtml = False  -> pas 'Author' dans copied
 try:
 	if(doc.info[0]['Author']):
@@ -128,35 +131,32 @@ try:
 			data['author'] = str(doc.info[0]['Author'])
 except:
 	a = 0  # do nothing
-
+'''
 
 # Recuperation des donnees
 
-copy = ''  # La section en cours de copie ('' : aucune)
+copy = 'author'  # La section en cours de copie ('' : aucune)
 # copied = [] (voir debut du programme)
 cpt = 0
 for line in lines:
 	# Abstract
 	if reg.match(r'^.{0,5}abstract(s)?.{0,100}\n', line.lower()) and not 'abstract' in copied:
-		print(line)
 		copy = 'abstract'
 		copied.append(copy)
 	# Introduction
 	elif reg.match(r'^.{0,5}introduction(s)?.{0,3}\n', line.lower()) and not 'introduction' in copied:
-		print("tat")
 		copy = 'introduction'
 		copied.append(copy)
 	# Fin Abstract
 	#elif str("1.\n") in line or str("I.\n") in line or str("1.\n") in line:
 	elif 'abstract' in copied and reg.match(r'^[1|I].{0,40}+\n', line) and not 'introduction' in copied :
-		print(line)
 		copy = ''
 	# Fin Introduction
 	elif reg.match(r'^2[\.|\ .+|\n]', line.lower()):
 		copy = 'corps'##fin d'introduction,on set le flag pour le corps
 		
 	# Conclusion
-	elif ( reg.match(r'^.{0,10}Conclusion(s)?.{0,40}\n', line) or reg.match(r'^.{0,10}CONCLUSION(S)?.{0,40}\n', line) ) and not 'conclusion' in copied:  # 'summary' pose probleme
+	elif ( reg.match(r'^.{0,10}Conclusion(s)?.{0,40}\n', line) or reg.match(r'^.{0,10}CONCLUSION(S)?.{0,40}\n', line) or reg.match(r'^.{0,10}Summary.{0,10}\n', line) or reg.match(r'^.{0,10}SUMMARY.{0,10}\n', line)) and not 'conclusion' in copied:  # 'summary' pose probleme
 		copied.append(copy)##append corps a copied
 		copy = 'conclusion'
 		copied.append(copy)
@@ -174,11 +174,12 @@ for line in lines:
 		copy = 'biblio'
 		copied.append(copy)
 	# Discussion
-	elif ( reg.match(r'^.{0,3}Discussion(s)?.{0,40}\n', line) or reg.match(r'^.{0,3}DISCUSSION(S)?.{0,40}\n', line) ) and not 'discussion' in copied:  # !!! {..,3}
+	elif ( reg.match(r'^.{0,5}Discussion(s)?.{0,40}\n', line) or reg.match(r'^.{0,5}DISCUSSION(S)?.{0,40}\n', line) ) and not 'discussion' in copied:  # !!! {..,3}
 		copied.append(copy)##append corps a copied
 		copy = 'discussion'
 		copied.append(copy)
 	# Auteurs
+	'''
 	if cpt > 0 and cpt < 200 and copy == '' and not line.strip() in data['title'] and (copy == 'author' or not 'author' in copied):
 		# not line.strip() data['title'] : si on est pas encore dans le titre
 		if cpt == 1:
@@ -186,6 +187,7 @@ for line in lines:
 		data['author'] = data['author']+line.strip()
 		copy = 'author'
 		copied.append('author')
+	'''
 	# Copie de bilio jusqu'a la fin du document (dernier element du doc : on en sort plus)
 	if 'biblio' in copied:
 		copy = 'biblio'
