@@ -24,3 +24,7 @@ il se trouve dans le dossier du fichier d'origine et est nommé _pdfFilePath_par
 
 **Exemple :** `cat ./testRessources/Boudin-Torres-2006.pdf_parser.txt`
 
+
+### Pour tester tout les pdf de ./testRessources d'un coup (XML)
+
+`./testAll.sh`
