@@ -10,6 +10,7 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from xml.dom import minidom
 import xml
+# -*- coding: utf-8 -*-
 def prettify(elem):
 	try:
 		rough_string = ElementTree.tostring(elem, encoding='utf-8')
@@ -45,7 +46,8 @@ data = {'fileName' : "",
 		'biblio' : "",
 		'discussion' : "",
 		'conclusion' : "",
-		'introduction': ""
+		'introduction': "",
+		'corps': ""
 	}
 
 copied = []
@@ -88,6 +90,7 @@ title = SubElement(head, 'title')
 auteur = SubElement(head, 'auteur')
 abstract = SubElement(head, 'abstract')
 introduction = SubElement(head, 'introduction')
+corps = SubElement(head, 'corps')
 conclusion = SubElement(head, 'conclusion')
 discusion = SubElement(head, 'discussion')
 biblio = SubElement(head, 'biblio')
@@ -127,10 +130,10 @@ except:
 	a = 0  # do nothing
 
 
-# Récupération des données
+# Recuperation des donnees
 
 copy = ''  # La section en cours de copie ('' : aucune)
-# copied = [] (voir début du programme)
+# copied = [] (voir debut du programme)
 cpt = 0
 for line in lines:
 	# Abstract
@@ -150,26 +153,29 @@ for line in lines:
 		copy = ''
 	# Fin Introduction
 	elif reg.match(r'^2[\.|\ .+|\n]', line.lower()):
-		copy = ''
+		copy = 'corps'##fin d'introduction,on set le flag pour le corps
+		
 	# Conclusion
-	elif ( reg.match(r'^.{0,10}Conclusion(s)?.{0,40}\n', line) or reg.match(r'^.{0,10}CONCLUSION(S)?.{0,40}\n', line) ) and not 'conclusion' in copied:  # 'summary' pose problème
+	elif ( reg.match(r'^.{0,10}Conclusion(s)?.{0,40}\n', line) or reg.match(r'^.{0,10}CONCLUSION(S)?.{0,40}\n', line) ) and not 'conclusion' in copied:  # 'summary' pose probleme
+		copied.append(copy)##append corps a copied
 		copy = 'conclusion'
 		copied.append(copy)
 	# Fin FACULTATIVE
 	#elif reg.match(r'^.{0,5}acknowledg(e)?ment(s)?', line.lower()):
 		#copy = ''
-	# Références bibliographiques (et = fin discussion)
+	# References bibliographiques (et = fin discussion)
 
 	#elif reg.match(r'^.{0,5}Reference(s)?.{0,3}\n', line) or reg.match(r'^.{0,5}REFERENCE(S)?.{0,3}\n', line): # and not 'biblio' in copied (On prends le dernier match)  # !!! {1,..}
 		#data['biblio'] = ""  # On garde seulement le dernier match ! (voir pdf Gonzalez)
 		#copy = 'biblio'
 		#copied.append(copy)
-	# Références bibliographiques (et = fin discussion)
+	# References bibliographiques (et = fin discussion)
 	elif ( reg.match(r'^.{0,5}Reference(s)?.{0,3}\n', line) or reg.match(r'^.{0,5}REFERENCE(S)?.{0,3}\n', line) ) and not 'biblio' in copied:
 		copy = 'biblio'
 		copied.append(copy)
 	# Discussion
 	elif ( reg.match(r'^.{0,3}Discussion(s)?.{0,40}\n', line) or reg.match(r'^.{0,3}DISCUSSION(S)?.{0,40}\n', line) ) and not 'discussion' in copied:  # !!! {..,3}
+		copied.append(copy)##append corps a copied
 		copy = 'discussion'
 		copied.append(copy)
 	# Auteurs
@@ -180,7 +186,7 @@ for line in lines:
 		data['author'] = data['author']+line.strip()
 		copy = 'author'
 		copied.append('author')
-	# Copie de bilio jusqu'à la fin du document (dernier element du doc : on en sort plus)
+	# Copie de bilio jusqu'a la fin du document (dernier element du doc : on en sort plus)
 	if 'biblio' in copied:
 		copy = 'biblio'
 	if copy != '':
@@ -199,6 +205,8 @@ if exportFormat == "txt":
 	sortie.write(data['abstract']+"\n")
 	sortie.write("Introduction : ")
 	sortie.write(data['introduction']+"\n")
+	sortie.write("Corps: ")
+	sortie.write(data['corps']+"\n")
 	sortie.write("Conclusion : ")
 	sortie.write(data['conclusion']+"\n")
 	sortie.write("Discussion : ")
@@ -211,6 +219,7 @@ else:
 	auteur.text=data['author']
 	abstract.text=data['abstract']
 	introduction.text=data['introduction']
+	corps.text=data['corps']
 	conclusion.text=data['conclusion']
 	discusion.text=data['discussion']
 	biblio.text=data['biblio']
