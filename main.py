@@ -134,34 +134,42 @@ copy = ''  # La section en cours de copie ('' : aucune)
 cpt = 0
 for line in lines:
 	# Abstract
-	if reg.match(r'^.{0,5}abstract(s)?[\.|\ |\n]', line.lower()) and not 'abstract' in copied:
+	if reg.match(r'^.{0,5}abstract(s)?.{0,100}\n', line.lower()) and not 'abstract' in copied:
 		print(line)
 		copy = 'abstract'
 		copied.append(copy)
-	# Fin Abstract
-	elif str("1.\n") in line or str("I.\n") in line or str("1.\n") in line:
-		#elif 'abstract' in copied and reg.match(r'^[1|i|I](.)+\n', line.lower()):
-		copy = ''
 	# Introduction
-	elif reg.match(r'^.{0,5}introduction(s)?[\.|\ |\n]', line.lower()) and not 'introduction' in copied:
+	elif reg.match(r'^.{0,5}introduction(s)?.{0,3}\n', line.lower()) and not 'introduction' in copied:
+		print("tat")
 		copy = 'introduction'
 		copied.append(copy)
+	# Fin Abstract
+	#elif str("1.\n") in line or str("I.\n") in line or str("1.\n") in line:
+	elif 'abstract' in copied and reg.match(r'^[1|I].{0,40}+\n', line) and not 'introduction' in copied :
+		print(line)
+		copy = ''
 	# Fin Introduction
 	elif reg.match(r'^2[\.|\ .+|\n]', line.lower()):
 		copy = ''
 	# Conclusion
-	elif reg.match(r'^.{0,10}conclusion(s)?[\.|\ |\n]', line.lower()) and not 'conclusion' in copied:  # 'summary' pose problème
+	elif ( reg.match(r'^.{0,10}Conclusion(s)?.{0,40}\n', line) or reg.match(r'^.{0,10}CONCLUSION(S)?.{0,40}\n', line) ) and not 'conclusion' in copied:  # 'summary' pose problème
 		copy = 'conclusion'
 		copied.append(copy)
 	# Fin FACULTATIVE
-	elif reg.match(r'^.{0,5}acknowledg(e)?ment(s)?', line.lower()):
-		copy = ''
+	#elif reg.match(r'^.{0,5}acknowledg(e)?ment(s)?', line.lower()):
+		#copy = ''
 	# Références bibliographiques (et = fin discussion)
-	elif reg.match(r'^.{1,5}reference(s)?[\.|\ |\n]', line.lower()) and not 'biblio' in copied:  # !!! {1,..}
+
+	#elif reg.match(r'^.{0,5}Reference(s)?.{0,3}\n', line) or reg.match(r'^.{0,5}REFERENCE(S)?.{0,3}\n', line): # and not 'biblio' in copied (On prends le dernier match)  # !!! {1,..}
+		#data['biblio'] = ""  # On garde seulement le dernier match ! (voir pdf Gonzalez)
+		#copy = 'biblio'
+		#copied.append(copy)
+	# Références bibliographiques (et = fin discussion)
+	elif ( reg.match(r'^.{0,5}Reference(s)?.{0,3}\n', line) or reg.match(r'^.{0,5}REFERENCE(S)?.{0,3}\n', line) ) and not 'biblio' in copied:
 		copy = 'biblio'
 		copied.append(copy)
 	# Discussion
-	elif reg.match(r'^.{0,3}discussion(s)?[\.|\ |\n]', line.lower()) and not 'discussion' in copied:  # !!! {..,3}
+	elif ( reg.match(r'^.{0,3}Discussion(s)?.{0,40}\n', line) or reg.match(r'^.{0,3}DISCUSSION(S)?.{0,40}\n', line) ) and not 'discussion' in copied:  # !!! {..,3}
 		copy = 'discussion'
 		copied.append(copy)
 	# Auteurs
