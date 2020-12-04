@@ -1,4 +1,4 @@
-for i in `ls ./testRessources/*.pdf`
+for i in {0..10}
 do
-	python3 ./main.py $i
+	echo $i | python3 ./main.py -x ./testRessources/
 done
