@@ -1,0 +1,107 @@
+<?xml version="1.0" ?>
+<opml version="1.0">
+ <article>
+  <preamble>
+  </preamble>
+  
+  <title>PERFECT
+  </title>OK -1
+  
+  <auteur>OK +1
+  </auteur>PERFECT
+  
+  <abstract>PERFECT
+  </abstract>PERFECT
+  
+  <introduction>PERFECT
+  </introduction>INCORRECT
+  
+  <corps>INCORRECT
+  </corps>PERFECT
+  
+  <discussion>PERFECT
+  </discussion>PERFECT
+  
+  <conclusion>PERFECT
+  </conclusion>PERFECT
+  
+  <biblio>PERFECT
+  </biblio>OK +1
+  
+ </article>
+</opml>
+
+Precision souple : 14/16
+Precision stricte : 11/16
+
+
+
+<article>
+	<title>
+		Summary Evaluation
+		with and without References
+	</title>
+	<auteur>
+		Juan-Manuel Torres-Moreno, Horacio Saggion, Iria da Cunha, Eric SanJuan, and Patricia Velázquez-Morales
+	</auteur>
+	<abstract>
+		We study a new content-based method for
+		the evaluation of text summarization systems without
+		human models which is used to produce system rankings.
+		[...]
+		Index Terms—Text summarization evaluation, content-based
+		evaluation measures, divergences.
+	</abstract>
+	<introduction>
+		T
+
+		EXT summarization evaluation has always been a
+		complex and controversial issue in computational
+		linguistics.
+		[...]
+		Section V discusses the
+		results and Section VI concludes the paper and identifies future
+		work.
+	</introduction>
+	<corps>
+		One of the first works to use content-based measures in
+		text summarization evaluation is due to [5], who presented an
+		evaluation framework to compare rankings of summarization
+		systems produced by recall and cosine-based measures.
+		[...]
+		Note that table VII presents results for
+		generic multi-document summarization in French, in this
+		case correlation scores are lower than correlation scores for
+		single-document summarization in French, a result which may
+		be expected given the diversity of input in multi-document
+		summarization.
+	</corps>
+	<discussion>
+		The departing point for our inquiry into text summarization
+		evaluation has been recent work on the use of content-based
+		
+		evaluation metrics that do not rely on human models but that
+		compare summary content to input content directly [12].
+		[...]
+		In the French corpus
+		PISTES, we suspect the situation is similar to the Spanish
+		case.
+	</discussion>
+	<conclusion>
+		This paper has presented a series of experiments in
+		content-based measures that do not rely on the use of model
+		summaries for comparison purposes.
+		[...]
+		Measure ROUGE-1 p-value ROUGE-2 p-value ROUGE-SU4 p-value J S 0.830 p &lt; 0.002 0.660 p &lt; 0.05 0.741 p &lt; 0.01 J S2 0.800 p &lt; 0.005 0.590 p &lt; 0.05 0.680 p &lt; 0.02 J S4 0.750 p &lt; 0.010 0.520 p &lt; 0.10 0.620 p &lt; 0.05 J SM 0.850 p &lt; 0.002 0.640 p &lt; 0.05 0.740 p &lt; 0.01 
+	</conclusion>
+	<biblio>
+		[1] I. Mani, G. Klein, D. House, L. Hirschman, T. Firmin, and
+		B. Sundheim, “Summac: a text summarization evaluation,” Natural
+		Language Engineering, vol. 8, no. 1, pp. 43–68, 2002.
+		[...]
+		[29] K. Knight and D. Marcu, “Statistics-based summarization-step one:
+		Sentence compression,” in Proceedings of the National Conference on
+		Artificial Intelligence. Menlo Park, CA; Cambridge, MA; London;
+		AAAI Press; MIT Press; 1999, 2000, pp. 703–710.
+	</biblio>
+</article>

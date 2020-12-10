@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<opml version="1.0">
+ <article>
+  <preamble>An_Improved_Branch-and-Cut_Code_for_the_Maximum_Balanced_Subgraph_of_a_Signed_Graph.pdf</preamble>
+  <title>An improved Branch-and-cut code for the maximum balanced subgraph of a signed graph
+</title>
+  <auteur>Rosa Figueiredoa,∗ , Yuri Frotab aCIDMA, Department of Mathematics, University of Aveiro 3810-193 Aveiro, [...]
+	work matrix; Community structure. ∗Corresponding author. Fax number: +351 234370066 Email: rosa.figueiredo@ua.pt Rosa Figueiredo is supported by FEDER founds through COMPETE-Operational Programme Factors of Competitiveness and by Portuguese founds through the CIDMA (University of Aveiro) and FCT, within project PEst-C/MAT/UI4106/2011 with COMPETE number FCOMP-01-0124-FEDER-022690. Preprint submitted to Elsevier December 17, 2013 arXiv:1312.4345v1 [cs.DM] </abstract>
+  <introduction>1. Introduction Let G = (V, E) be an undirected graph where V = {1, 2, . . . , n} is the set[...] Also, we assume that parallel edges have always opposite signs.</introduction>
+<corp>2 Integer programming formulation and branch-and-cut[...]Table 3: Results obtained on the new DMERN instances.</corp>
+  <discussion/>
+  <conclusion/>
+  <biblio>References [1] P. Abell and M. Ludwig. Structural balance: a dynamic perspective. Jour- nal of Mathematical Sociology, 33:129–155, 2009.[...][22] T. Zaslavsky. A mathematical bibliography of signed and gain graphs and allied areas. Electronic Journal of Combinatorics DS8, 1998. 12 </biblio>
+ </article>
+</opml>

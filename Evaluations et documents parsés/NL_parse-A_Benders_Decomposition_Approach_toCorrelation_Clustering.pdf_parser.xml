@@ -1,0 +1,840 @@
+b'<opml version="1.0">
+	<article>
+		<preamble>
+			A_Benders_Decomposition_Approach_toCorrelation_Clustering.pdf
+		</preamble>
+		<title>
+			A Benders Decomposition Approach to Correlation Clustering
+		</title>
+		<auteur>
+			Margret Keuper
+			University of Mannheim
+			Baden Wurttemberg, Germany
+			keuper@uni-mannheim.de
+			Jovita Lukasik
+			University of Mannheim
+			Baden Wurttemberg, Germany
+			jovita@informatik.uni-mannheim.de
+			Maneesh Singh
+			Verisk
+			Jersey City, New Jersey, USA
+			maneesh.singh@verisk.com
+			Julian Yarkony
+			Verisk
+			Jersey City, New Jersey, USA
+			julian.yarkony@verisk.com
+		</auteur>
+		<abstract>
+			Abstract
+			We tackle the problem of graph partitioning for image segmentation using cor-
+			relation clustering (CC), which we treat as an integer linear program (ILP). We
+			reformulate optimization in the ILP so as to admit efficient optimization via Ben-
+			ders decomposition, a classic technique from operations research. Our Benders
+			decomposition formulation has many subproblems, each associated with a node in
+			the CC instance’s graph, which can be solved in parallel. Each Benders subproblem
+			enforces the cycle inequalities corresponding to edges with negative (repulsive)
+			weights attached to its corresponding node in the CC instance. We generate
+			Magnanti-Wong Benders rows in addition to standard Benders rows to accelerate
+			optimization. Our Benders decomposition approach provides a promising new
+			avenue to accelerate optimization for CC, and, in contrast to previous cutting plane
+			approaches, theoretically allows for massive parallelization.
+		</abstract>
+		<introduction>
+			1 Introduction
+			Many computer vision tasks involve partitioning (clustering) a set of observations into unique entities.
+			A powerful formulation for such tasks is that of (weighted) correlation clustering (CC). CC is defined
+			on a sparse graph with real valued edge weights, where nodes correspond to observations and
+			weighted edges describe the affinity between pairs of nodes.
+			For example, in image segmentation (on superpixel graphs), nodes correspond to superpixels and
+			edges indicate adjacency between superpixels. The weight of the edge between a pair of superpixels
+			relates to the probability, as defined by a classifier, that the two superpixels belong to the same ground
+			truth entity. This weight is positive, if the probability is greater than 1
+			2 and negative if it is less than 1
+			2 .
+			The magnitude of the weight is a function of the confidence of the classifier.
+			The CC cost function sums up the weights of the edges separating connected components (referred
+			to as entities) in a proposed partitioning of the graph. Optimization in CC partitions the graph into
+			entities so as to minimize the CC cost. CC is appealing, since the optimal number of entities emerges
+			naturally as a function of the edge weights, rather than requiring an additional search over some
+			model order parameter describing the number of clusters (entities) [37].
+			Optimization in CC is NP-hard for general graphs [5]. Previous methods for the optimization of CC
+			problems such as described in Andres et al. [1, 2] and Nowozin and Jegelka [25] are based on linear
+			programming with cutting planes. They do not scale easily to large CC problem instances and are not
+			Preprint. Under review.
+			arXiv:1902.05659v2
+			[cs.CV]
+			2
+			Aug
+			2019
+			easily parallelizable. The goal of this paper is to introduce an efficient mechanism for optimization in
+			CC for domains, where massively parallel computation could be employed.
+			In this paper we apply the classic Benders decomposition from operations research [10] to CC for
+			computer vision. Benders decomposition is commonly applied in operations research to solve mixed
+			integer linear programs (MILP) that have a special but common block structure. Benders decomposi-
+			tion partitions the variables in the MILP between a master problem and a set of subproblems. The
+			block structure requires that no row of the constraint matrix of the MILP contains variables from
+			more than one subproblem. Variables explicitly enforced to be integral lie only in the master problem.
+			Optimization in Benders decomposition is achieved using a cutting plane algorithm. Optimization
+			proceeds with the master problem solving optimization over its variables. The subsequent solution
+			of the subproblems can be done in parallel and provides primal/dual solutions over their variables
+			conditioned on the solution to the master problem. The dual solutions to the subproblems provide
+			constraints to the master problem. Optimization continues until no further constraints are added to
+			the master problem.
+			Benders decomposition is an exact MILP programming solver, but can be intuitively understood as
+			a coordinate descent procedure, iterating between the master problem and the subproblems. Here,
+			solving the subproblems not only provides a solution for their variables, but also a lower bound in the
+			form of a hyper-plane over the master problem’s variables. This lower bound is tight at the current
+			solution to the master problem.
+			Benders decomposition is accelerated using the seminal operations research technique of Magnanti-
+			Wong Benders rows (MWR) [23]. MWR are generated by solving the Benders subproblems with an
+			alternative (often random) objective under the hard constraint of optimality (possibly within a factor)
+			regarding the original objective of the subproblem.
+			Our contribution is the use of Benders decomposition with MWR to tackle optimization in CC. This
+			allows for massive parallelization, in contrast to classic approaches to CC such as in Andres et al. [1].
+		</introduction>
+		<corps>
+			2 Related Work
+			Correlation clustering has been successfully applied to multiple problems in computer vision including
+			image segmentation, multi-object tracking, instance segmentation and multi-person pose estimation.
+			The classical work of Andres et al. [1] models image segmentation as CC, where nodes correspond to
+			superpixels. Andres et al. [1] optimize CC using an integer linear programming (ILP) branch-and-cut
+			strategy which precludes parallel execution. Kim et al. [21] extend CC to include higher-order cost
+			terms over sets of nodes, which they solve using an approach similar to [1]. A parallel optimization
+			scheme for complete, unweighted graphs has been proposed by Pan et al. [26]. This approach relies
+			on random sampling and only provides optimality bounds.
+			Yarkony et al. [37] tackle CC in the planar graph structured problems commonly found in computer
+			vision. They introduce a column generation [16, 6] approach, where the pricing problem corresponds
+			to finding the lowest reduced cost 2-colorable partition of the graph, via a reduction to minimum cost
+			perfect matching [13, 29, 22]. This approach has been extended to hierarchical image segmentation
+			in Yarkony and Fowlkes [35] and to specific cases of non-planar graphs in Yarkony [34], Zhang et al.
+			[39], Andres et al. [3].
+			Large CC problem instances such as defined in Keuper et al. [20, 19] and Beier et al. [9] are usually
+			addressed by primal feasible heuristics [7, 8, 18, 20, 30]. Such approaches are highly relevant in
+			practice whenever the optimal solution is out of reach, but they do not provide any guarantees on the
+			quality of the solution.
+			Tang et al. [31] tackles multi-object tracking using a formulation closely related to CC, where nodes
+			correspond to detections of objects and edges are associated with probabilities of co-association.The
+			work of Insafutdinov et al. [17] and Pishchulin et al. [27] build on Tang et al. [31] in order to formulate
+			multi-person pose estimation using CC augmented with node labeling.
+			Our work is derived from the classical work in operations research on Benders decomposition [10, 11,
+			15]. Specifically, we are inspired by the fixed charge formulations of Cordeau et al. [12], which solves
+			a mixed integer linear program over a set of fixed charge variables (opening links) and a larger set of
+			fractional variables (flows of commodities from facilities to customers in a network) associated with
+			2
+			constraints. Benders decomposition reformulates optimization so as to use only the integer variables
+			and converts the fractional variables into constraints. These constraints are referred to as Benders
+			rows. Optimization is then tackled using a cutting plane approach. Optimization is accelerated by the
+			use of MWR [23], which are more binding than the standard Benders rows.
+			Benders decomposition has recently been introduced to computer vision (though not for CC), for the
+			purpose of multi-person pose estimation [32, 33, 36]. In these works, multi-person pose estimation is
+			modeled so as to admit efficient optimization, using column generation and Benders decomposition
+			jointly. The application of Benders decomposition in our paper is distinct regarding the problem
+			domain, the underlying integer program and the structure of the Benders subproblems.
+			3 Standard Correlation Clustering Formulation
+			In this section, we review the standard optimization formulation for CC [1], which corresponds to a
+			graph partitioning problem w.r.t. the graph G = (V, E). This problem is defined by the following
+			binary edge labeling problem.
+			Definition 1. Given a graph G = (V, E) with nodes v ∈ V and undirected edges (vi, vj) ∈ E. A
+			label xvivj
+			∈ {0, 1} indicates with xvivj
+			= 1 that the nodes vi, vj are in separate components and is
+			zero otherwise. Given the edge weight φvivj
+			∈ R, the binary edge labeling problem is to find an edge
+			label x = (xvivj ) ∈ {0, 1}|E|
+			, for which the total weight of the cut edges is minimized:
+			min
+			x∈{0,1}|E|
+			X
+			(vi,vj )∈E−
+			−φvivj (1 − xvivj ) +
+			X
+			(vi,vj )∈E+
+			φvivj xvivj (CC1)
+			s.t.
+			X
+			(vi,vj )∈E+
+			c
+			xvivj
+			≥ xvc
+			i vc
+			j
+			∀c ∈ C, (1)
+			where E−
+			, E+
+			denote the subsets of E, for which the weight φvivj
+			is negative and non-negative,
+			respectively, C is the set of undirected cycles in E containing exactly one member of E−
+			, (vc
+			i , vc
+			j ) is
+			the edge in E−
+			associated with cycle c and E+
+			c ⊆ E+
+			associated with cycle c.
+			Note that the graph G defined by E is very sparse for real problems [37]. Also we refer to an edge
+			(vi, vj) with xvivj
+			= 1 as a cut edge.
+			The objective in Eq. (CC1) is to minimize the total weight of the cut edges. The constraints in Eq. (1)
+			ensure that, within every cycle of G, the number of cut edges can not be exactly one. This enforces
+			the labeling x to decompose G such that cut edges are exactly those edges that straddle distinct
+			components. We refer to the constraints in Eq. (1) as cycle inequalities.
+			Solving Eq. (CC1) is intractable due to the large number of cycle inequalities. Andres et al. [1]
+			generates solutions by alternating between solving the ILP over a nascent set of constraints ˆ
+			C
+			(initialized empty) and adding new constraints from the set of currently violated cycle inequalities.
+			Generating constraints corresponds to iterating over (vi, vj) ∈ E−
+			and identifying the shortest
+			path between the nodes vi, vj in the graph with edges E \ (vi, vj) and weights equal to x. If the
+			corresponding path has total weight less than xvivj
+			, the corresponding constraint is added to ˆ
+			C. The
+			LP relaxation of Eq. (CC1)-(1) can be solved instead of the ILP in each iteration until no violated
+			cycle inequalities exist, after which the ILP must be solved in each iteration.
+			We should note that earlier work in CC for computer vision did not require that cycle inequalities
+			contain exactly one member of E−
+			, which is on the right hand side of Eq. (1). It is established with
+			Lemma(1) in Yarkony et al. [38], that the addition of cycle inequalities, that contain edges in E−
+			, E+
+			on the left hand side, right hand side of Eq. (1), respectively, do not tighten the ILP in Eq. (CC1)-(1)
+			or its LP relaxation.
+			In this section, we reviewed the baseline approach for solving CC in the computer vision community.
+			In the subsequent sections, we rely on the characterization of CC in Eq. (CC1)-(1), though not on the
+			specific solver of Andres et al. [1].
+			3
+			4 Benders Decomposition for Correlation Clustering
+			In this section, we introduce a novel approach to CC using Benders decomposition (referred to as
+			BDCC). Our proposed decomposition is defined by a minimal vertex cover on E−
+			with members
+			S ⊂ V indexed by vs. Each s ∈ S is associated with a Benders subproblem and vs is referred to as
+			the root of that Benders subproblem. Edges in E−
+			are partitioned arbitrarily between the subproblems,
+			such that each (vi, vj) ∈ E−
+			is associated with either the subproblem with root vi or the subproblem
+			with root vj. Here, E−
+			s is the subset of E−
+			associated with subproblem s. The subproblem with root
+			vs enforces the cycle inequalities Cs, where Cs is the subset of C containing edges in E−
+			s . We use E+
+			s
+			to denote the subset of E+
+			adjacent to vs.
+			In this section, we assume that we are provided with S, which can be produced greedily or using an
+			LP/ILP solver.
+			Below, we rewrite Eq. (CC1) using an auxiliary function Q(φ, s, x). Here Q(φ, s, x) provides the
+			cost to alter x to satisfy all cycle inequalities in Cs, by increasing/decreasing xvivj for (vi, vj) in
+			E+
+			/E−
+			s , respectively. Below we describe the changes of the master’s problem edge labeling x, which
+			is based on the edge labeling of each Benders subproblem xs
+			= (xs
+			vivj
+			) ∈ {0, 1}|s|
+			, where |s| is the
+			number of edges in the subproblem s.
+			(CC1) (CC2): min
+			x∈{0,1}|E|
+			X
+			(vi,vj )∈E−
+			−φvivj (1 − xvivj ) +
+			X
+			(vi,vj )∈E+
+			φvivj xvivj +
+			X
+			s∈S
+			Q(φ, s, x),
+			(CC2)
+			where Q(φ, s, x) is defined as follows.
+			Q(φ, s, x) = min
+			xs
+			∈{0,1}|s|
+			X
+			(vi,vj )∈E−
+			s
+			−φvivj
+			(1 − xs
+			vivj
+			) +
+			X
+			(vi,vj )∈E+
+			φvivj
+			xs
+			vivj
+			(2)
+			s.t.
+			X
+			(vi,vj )∈E+
+			c
+			xvivj
+			+ xs
+			vivj
+			≥ xvc
+			i vc
+			j
+			− (1 − xs
+			vc
+			i vc
+			j
+			) ∀c ∈ Cs.
+			We now construct a solution x∗
+			= {x∗
+			vivj
+			, (xs∗
+			vivj
+			)s∈S} for which Eq. (CC2) is minimized and all
+			cycle inequalities are satisfied. We start from a given solution x = {xvivj
+			, (xs
+			vivj
+			)s∈S} and proceed
+			as follows.
+			x∗
+			vivj
+			M
+			= min(xvivj
+			, xs
+			vivj
+			) ∀(vi, vj) ∈ E−
+			s , s ∈ S (3)
+			x∗
+			vivj
+			M
+			= xvivj + max
+			s∈S
+			xs
+			vivj
+			∀(vi, vj) ∈ E+
+			. (4)
+			The right hand side of Eq. (4) cannot exceed 1 at optimality because of the constraint in Eq. (2).
+			Given the solution x∗
+			vivj
+			, the optimizing solution to each Benders subproblem s is denoted xs∗
+			vivj
+			and
+			is defined as follows.
+			xs∗
+			vivj
+			=
+			
+			1, if (vi, vj) ∈ E−
+			s
+			0, otherwise.
+			(5)
+			In Sec. A in the supplement, we show that the cost of {x∗
+			vivj
+			, (xs∗
+			vivj
+			)s∈S} is no greater than that of
+			{xvivj
+			, (xs
+			vivj
+			)s∈S}, with regard to the objective in Eq. (CC2) and that Q(φ, s, x∗
+			) = 0 holds for all
+			s ∈ S.
+			It follows that there always exists an optimizing solution x to Eq. (CC2) such that Q(φ, s, x) = 0 for
+			all s ∈ S.
+			Observe, that there exists an optimal partition xs
+			of the nodes of the graph , in Eq. (2), which is
+			2-colorable. This is because any partition xs
+			can be altered without increasing its cost, by merging
+			connected components that are adjacent to one another, not including the root node vs. Note, that
+			merging any pair of such components, does not increase the cost, since those components are not
+			separated by negative weight edges in subproblem s and so the result is still a partition.
+			Given this observation, we rewrite the optimization Eq. (CC2) regarding Q(φ, s, x), using the node
+			labeling formulation of min-cut, with the notation below.
+			4
+			We indicate with mv = 1 that node v ∈ V is not in the component associated with the root of
+			subproblem s and mv = 0 otherwise. To avoid extra notation mvs is replaced by 0. Let
+			fs
+			vivj
+			=
+			(
+			1, for (vi, vj) ∈ E+
+			, if (vi, vj) is cut in xs
+			, but is not cut in x
+			1, for (vi, vj) ∈ E−
+			s , if (vi, vj) is not cut in xs
+			, but is cut in x.
+			(6)
+			Thus, the definition for the first/second case implies a penalty of φvivj
+			/ - φvivj
+			, which is added to
+			Q(φ, s, x). Note moreover that xs
+			vivj
+			= fs
+			vivj
+			for all (vi, vj) ∈ E+
+			and that xs
+			vivj
+			= 1 − fs
+			vivj
+			for all
+			(vi, vj) ∈ E−
+			s .
+			Below we write Q(φ, s, x) as primal/dual LP, with primal constraints associated with dual variables
+			ψ, λ, which are noted in the primal. Given binary x, we need only enforce that f, m are non-negative
+			to ensure that there exists an optimizing solution for f, m which is binary. This is a consequence of
+			the optimization being totally unimodular, given that x is binary. Total unimodularity is a known
+			property of the min-cut/max flow LP [14]. The primal subproblem is therefore given by the following.
+			Q(φ, s, x) = min
+			fs
+			vivj
+			≥0
+			mv≥0
+			X
+			(vi,vj )∈E+
+			φvivj fs
+			vivj
+			−
+			X
+			(vs,v)∈E−
+			s
+			φvsvfs
+			vsv (7)
+			λ−
+			vivj
+			: mvi
+			− mvj
+			≤ xvivj
+			+ fs
+			vivj
+			∀(vi, vj) ∈ (E+
+			\ E+
+			s ),
+			λ+
+			vivj
+			: mvj
+			− mvi
+			≤ xvivj
+			+ fs
+			vivj
+			∀(vi, vj) ∈ (E+
+			\ E+
+			s ),
+			ψ−
+			v : xvsv − fs
+			vsv ≤ mv ∀(vs, v) ∈ E−
+			s ,
+			ψ+
+			v : mv ≤ xvsv + fs
+			vsv ∀(vs, v) ∈ E+
+			s ,
+			This yields to the corresponding dual subproblem.
+			max
+			λ≥0
+			ψ≥0
+			−
+			X
+			(vi,vj )∈(E+\E+
+			s )
+			(λ−
+			vivj
+			+ λ+
+			vivj
+			)xvivj
+			+
+			X
+			(vs,v)∈E−
+			s
+			ψ−
+			v xvsv −
+			X
+			(vs,v)∈E+
+			s
+			ψ+
+			v xvsv (8)
+			s.t. ψ+
+			vi
+			1E+
+			s
+			(vs, vi) − ψ−
+			vi
+			1E−
+			s
+			(vs, vi)+
+			X
+			vj
+			(vi,vj )∈(E+
+			\E+
+			s )
+			(λ−
+			vivj
+			− λ+
+			vivj
+			) +
+			X
+			vj
+			(vj ,vi)∈(E+
+			\E+
+			s )
+			(λ+
+			vj vi
+			− λ−
+			vj vi
+			) ≥ 0 ∀vi ∈ V − vs
+			−φvsv − ψ−
+			v ≥ 0 ∀(vs, v) ∈ E−
+			s
+			φvsv − ψ+
+			v ≥ 0 ∀(vs, v) ∈ E+
+			s
+			φvivj
+			− (λ−
+			vivj
+			+ λ+
+			vivj
+			) ≥ 0 ∀(vi, vj) ∈ (E+
+			\ E+
+			s ).
+			In Eq. (8) and subsequently 1Λ(x) denotes the binary indicator function for some set Λ, which returns
+			one if (x ∈ Λ) and zero otherwise. We now consider the constraint that Q(φ, s, x) = 0. Note that
+			any dual feasible solution for the dual problem (8) describes an affine function of x, which is a tight
+			lower bound on Q(φ, s, x). We compact the terms λ, ψ into ωz
+			, where ωz
+			vivj
+			is associated with the
+			xvivj
+			term.
+			ωz
+			vivj
+			=
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			−(λ−
+			vivj
+			+ λ+
+			vivj
+			), if (vi, vj) ∈ (E+
+			\ E+
+			s )
+			−ψ+
+			vj
+			, if (vi, vj) ∈ E+
+			s
+			ψ−
+			vj
+			, if (vi, vj) ∈ E−
+			s
+			0, if (vi, vj) ∈ (E−
+			\ E−
+			s ).
+			We denote the set of all dual feasible solutions across s ∈ S as Z, with z ∈ Z. Observe, that to
+			enforce that Q(φ, s, x) = 0, it is sufficient to require that
+			P
+			(vi,vj )∈E xvivj
+			ωz
+			vivj
+			≤ 0, for all z ∈ Z.
+			We formulate CC as optimization using Z below.
+			(CC2) (CC3) = min
+			x∈{0,1}|E|
+			X
+			(vi,vj )∈E+
+			φvivj xvivj −
+			X
+			(vi,vj )∈E−
+			(1 − xvivj )φvivj (CC3)
+			s.t.
+			X
+			(vi,vj )∈E
+			xvivj
+			ωz
+			vivj
+			≤ 0 ∀z ∈ Z
+			5
+			Algorithm 1 Benders Decomposition for CC (BDCC)
+			1: Ẑ = {}
+			2: done_LP = False
+			3: repeat
+			4: x = Solve Eq. (CC3) over Ẑ enforcing integrality if and only if done_LP=True
+			5: did_add = False
+			6: for s ∈ S do
+			7: if ∃(vi, vj) ∈ E−
+			s s.t. d(vi, vj) < xvivj
+				then
+				8: z1 = Get Benders row via Eq (8).
+				9: z2 = Get MWR via Sec. 5.
+				10: Ẑ = Ẑ ∪ z1 ∪ z2
+				11: did_add = True
+				12: end if
+				13: end for
+				14: if did_add=False then
+				15: done_LP = True
+				16: end if
+				17: until did_add=False AND xvivj
+				∈ {0, 1} ∀(vi, vj) ∈ E
+				18: Return x
+				4.1 Cutting Plane Optimization
+				Optimization in Eq. (CC3) is intractable since |Z| equals the number of dual feasible solutions across
+				subproblems, which is infinite. Since we cannot consider the entire set Z, we use a cutting plane
+				approach to construct a set Ẑ ⊂ Z, that is sufficient to solve Eq. (CC3) exactly. We initialize Ẑ as
+				the empty set. We iterate between solving the LP relaxation of Eq. (CC3) over Ẑ (referred to as the
+				master problem) and generating new Benders rows until no violated constraints exist.
+				This ensures that no violated cycle inequalities exist but may not ensure that x is integral. To enforce
+				integrality, we iterate between solving the ILP in Eq. (CC3) over Ẑ and adding Benders rows to Ẑ.
+				By solving the LP relaxation first, we avoid unnecessary and expensive calls to the ILP solver.
+				To generate Benders rows given x, we iterate over S and generate one Benders row using Eq. (8), if s
+				is associated with a violated cycle inequality, which we determine as follows. Given s, x we iterate
+				over (vi, vj) ∈ E−
+				s . We find the shortest path from vi to vj on graph G with edges E, with weights
+				equal to the vector x. If the length of this path, denoted as d(vi, vj), is strictly less than xvivj , then
+				we have identified a violated cycle inequality associated with s.
+				We describe our cutting plane approach in Alg. 1, with line by line description in Sec. B in the
+				supplementary material. To accelerate optimization, we add MWR in addition to standard Benders
+				rows, which we describe in the following Sec. 5.
+				Prior to termination of Alg. 1, one can produce a feasible integer solution x∗
+				from any solution x,
+				provided by the master problem, as follows. First, for each (vi, vj) ∈ E, set x∗∗
+				vivj
+				= 1, if xvivj
+				> 1
+				2
+				and otherwise set x∗∗
+				vivj
+				= 0. Second, for each (vi, vj) ∈ E, set x∗
+				vivj
+				= 1, if vi, vj are in separate
+				connected components of the solution described by x∗∗
+				and otherwise set x∗
+				vivj
+				= 0. The cost of the
+				feasible integer solution x∗
+				provides an upper bound on the cost of the optimal solution. In Sec. C
+				(supplementary material), we provide a more involved approach to produce feasible integer solutions.
+				In this section, we characterized CC using Benders decomposition and provided a cutting plane
+				algorithm to solve the corresponding optimization.
+				5 Magnanti-Wong Benders Rows
+				We accelerate Benders decomposition (see Sec. 4) using the classic operations research technique of
+				Magnanti-Wong Benders Rows (MWR) [23]. The Benders row, given in Eq. (8), provides a tight
+				bound at x∗
+				, where x∗
+				is the master problem solution used to generate the Benders row. However,
+				ideally, we want our Benders row to provide good lower bounds for a large set of x different from x∗
+				,
+				6
+				Figure 1: Left: We plot the gap between the upper and lower bounds as a function of time for various
+				values of τ on selected problem instances. We use red,green,blue for τ = [0.5, 0.99, .01] respectively,
+				and black for not using Magnanti-Wong rows. We show both the computation time with and without
+				exploiting parallelization of subproblems with dotted and solid lines, respectively. We use titles to
+				indicate the approximate difficulty of the problem as ranked by input file size of 100 files.
+				Right: We compare the benefits of parallelization and MWR across our data set. We scatter plot the
+				total running time versus the total running time when solving each subproblem is done on its own
+				CPU across problem instances. We use red to indicate τ = 0.5 and black to indicate that MWR are
+				not used. We draw a line with slope=1 in magenta to better enable appreciation of the red and black
+				points. NOTE: The time spent generating Benders rows, in a given iteration of BDCC when using
+				parallel processing, is the maximum time spent to solve any sub-problem for that iteration.
+				while being tight (or perhaps very active) at x∗
+				. To achieve this, we use a modified version of Eq. (8),
+				where we replace the objective and add one additional constraint.
+				We follow the tradition of the operations research literature and use a random negative valued vector
+				(with unit norm) in place of the objective Eq. (8). This random vector is unique each time a Benders
+				subproblem is solved. We experimented with using as an objective −1
+				.0001+|φvivj
+				| , which encourages
+				the cutting of edges with large positive weight, but it works as well as the random negative objective.
+				Here .0001 is a tiny positive number. It prevents the terms in the objective from becoming infinite.
+				Below, we enforce the new Benders row to be active at x∗
+				, by requiring that the dual cost is within a
+				tolerance τ ∈ (0, 1) of the optimum w.r.t. the objective in Eq. (8).
+				τQ(φ, s, x) ≤ −
+				X
+				(vi,vj )∈(E+\E+
+				s )
+				(λ−
+				vivj
+				+ λ+
+				vivj
+				)xvivj
+				+
+				X
+				(vs,v)∈E−
+				s
+				ψ−
+				v xvsv −
+				X
+				(vs,v)∈E+
+				s
+				ψ+
+				v xvsv
+				(9)
+				Here, τ = 1 requires optimality w.r.t. the objective in Eq. (8), while τ = 0 ignores optimality. In our
+				experiments, we found that τ = 1
+				2 provides strong performance.
+				6 Experiments: Image Segmentation
+				In this section, we demonstrate the value of our algorithm BDCC on CC problem instances for image
+				segmentation on the benchmark Berkeley Segmentation Data Set (BSDS) [24]. Our experiments
+				demonstrate the following three findings. (1) BDCC solves CC instances for image segmenta-
+				tion; (2) BDCC successfully exploits parallelization; (3) the use of MWR dramatically accelerates
+				optimization.
+				To benchmark performance, we employ cost terms provided by the OPENGM2 dataset [4] for BSDS.
+				This allows for a direct comparison of our results to the ones from Andres et al. [1]. We use the
+				random unit norm negative valued objective when generating MWR. We use CPLEX to solve all
+				linear and integer linear programming problems considered during the course of optimization. We use
+				a maximum total CPU time of 600 seconds, for each problem instance (regardless of parallelization).
+				7
+				Table 1: We show the percentage of problems solved that have a duality gap of up to tolerance ,
+				within a certain amount of time (10,50,100,300) seconds, with and without MWR/parallelization.
+				We use par =1 to indicate the use of parallelization and par=0 otherwise. Here τ = 0 means that no
+				MWR are generated.
+				=0.1 τ par 10 50 100 300
+				0.5 0 0.149 0.372 0.585 0.894
+				0 0 0.0106 0.0532 0.0745 0.106
+				0.5 1 0.266 0.777 0.904 0.968
+				0 1 0.0426 0.0745 0.0745 0.138
+				=1 τ par 10 50 100 300
+				0.5 0 0.149 0.394 0.606 0.904
+				0 0 0.0106 0.0638 0.0745 0.16
+				0.5 1 0.319 0.819 0.947 0.979
+				0 1 0.0532 0.0745 0.106 0.17
+				=10 τ par 10 50 100 300
+				0.5 0 0.202 0.426 0.628 0.915
+				0 0 0.0532 0.0957 0.128 0.223
+				0.5 1 0.447 0.936 0.979 0.989
+				0 1 0.0638 0.128 0.181 0.287
+				We formulate the selection of S, as a minimum vertex cover problem, where for every edge (vi, vj) ∈
+				E−
+				, at least one of vi, vj is in S. We solve for the minimum vertex cover exactly as an ILP. Given S,
+				we assign edges in E−
+				to a connected selected node in S arbitrarily. We found experimentally that
+				solving for the minimum vertex cover consumed negligible CPU time for our dataset. We attribute
+				this fact to the structure of our problem domain, since the minimum vertex cover is an NP-hard
+				problem. For problem instances where solving for the minimum vertex cover exactly is difficult, the
+				minimum vertex cover problem can be solved approximately or greedily.
+				In Fig. 1 (left) we demonstrate the effectiveness of BDCC with various τ for different problem
+				difficulties. We observe that the presence of MWR dramatically accelerates optimization. However,
+				the exact value of τ does not effect the speed of optimization dramatically. We show performance
+				with and without relying on parallel processing. Our parallel processing times assume that we
+				have one CPU for each subproblem. For the problem instances in our application the number of
+				subproblems is under one thousand, each of which are very easy to solve. The parallel and non-
+				parallel time comparisons share only the time to solve the master problem. We observe large benefits
+				of parallelization for all settings of τ. However, when MWR are not used, we observe diminished
+				improvement, since the master problem consumes a larger proportion of total CPU time.
+				In Fig. 1(right), we demonstrate the speed up induced by the use of parallelization. For most problem
+				instances, the total CPU time required when using no MWR was prohibitively large, which is not the
+				case when MWR are employed. Thus most problem instances solved without MWR terminated early.
+				In Tab. 1, we consider the convergence of the bounds for τ = {0, 1
+				2 }; ( τ = 0 means that no MWR
+				are generated). We consider a set of tolerances on convergence regarding the duality gap, which is
+				the difference between the anytime solution (upper bound) and the lower bound on the objective. For
+				each such tolerance , we compute the percentage of instances, for which the duality gap is less than
+				, after various amounts of time. We observe that the performance of optimization without MWR,
+				but exploiting parallelization performs worse than using MWR, but without paralleliziation. This
+				demonstrates that, across the dataset, MWR are of greater importance than parallelization.
+		</corps>
+		<discussion />
+		<conclusion>
+			7 Conclusions
+			We present a novel methodology for finding optimal correlation clustering in arbitrary graphs. Our
+			method exploits the Benders decomposition to avoid the enumeration of a large number of cycle
+			inequalities. This offers a new technique in the toolkit of linear programming relaxations, that we
+			expect will find further use in the application of combinatorial optimization to problems in computer
+			vision.
+			8
+			The exploitation of results from the domain of operations research may lead to improved variants
+			of BDCC. For example, one can intelligently select the subproblems to solve instead of solving all
+			subproblems in each iteration. This strategy is referred to as partial pricing in the operations research
+			literature. Similarly one can devote a minimum amount of time in each iteration to solve the master
+			problem so as to enforce integrality on a subset of the variables of the master problem.
+		</conclusion>
+		<biblio>
+			References
+			[1] B. Andres, J. H. Kappes, T. Beier, U. Kothe, and F. A. Hamprecht. Probabilistic image segmentation
+			with closedness constraints. In Proceedings of the Fifth International Conference on Computer Vision
+			(ICCV-11), pages 2611–2618, 2011.
+			[2] B. Andres, T. Kroger, K. L. Briggman, W. Denk, N. Korogod, G. Knott, U. Kothe, and F. A. Ham-
+			precht. Globally optimal closed-surface segmentation for connectomics. In Proceedings of the Twelveth
+			International Conference on Computer Vision (ECCV-12), 2012.
+			[3] B. Andres, J. Yarkony, B. S. Manjunath, S. Kirchhoff, E. Turetken, C. Fowlkes, and H. Pfister. Segmenting
+			planar superpixel adjacency graphs w.r.t. non-planar superpixel affinity graphs. In Proceedings of the Ninth
+			Conference on Energy Minimization in Computer Vision and Pattern Recognition (EMMCVPR-13), 2013.
+			[4] B. Andres, T. Beier, and J. H. Kappes. Opengm2, 2014.
+			[5] N. Bansal, A. Blum, and S. Chawla. Correlation clustering. In Journal of Machine Learning, pages
+			238–247, 2002.
+			[6] C. Barnhart, E. L. Johnson, G. L. Nemhauser, M. W. P. Savelsbergh, and P. H. Vance. Branch-and-price:
+			Column generation for solving huge integer programs. Operations Research, 46:316–329, 1996.
+			[7] T. Beier, T. Kroeger, J. H. Kappes, U. Kothe, and F. A. Hamprecht. Cut, glue, & cut: A fast, approximate
+			solver for multicut partitioning. In CVPR, 2014.
+			[8] T. Beier, F. A. Hamprecht, and J. H. Kappes. Fusion moves for correlation clustering. In CVPR, 2015.
+			[9] T. Beier, B. Andres, K. Ullrich, and F. A. Hamprecht. An efficient fusion move algorithm for the
+			minimum cost lifted multicut problem. volume LNCS 9906, pages 715–730. Springer, 2016. doi:
+			10.1007/978-3-319-46475-6_44.
+			[10] J. F. Benders. Partitioning procedures for solving mixed-variables programming problems. Numerische
+			mathematik, 4(1):238–252, 1962.
+			[11] J. R. Birge. Decomposition and partitioning methods for multistage stochastic linear programs. Operations
+			research, 33(5):989–1007, 1985.
+			[12] J.-F. Cordeau, G. Stojković, F. Soumis, and J. Desrosiers. Benders decomposition for simultaneous aircraft
+			routing and crew scheduling. Transportation science, 35(4):375–388, 2001.
+			[13] M. E. Fisher. On the dimer solution of planar ising models. Journal of Mathematical Physics, 7(10):
+			1776–1781, 1966.
+			[14] L. R. Ford and D. R. Fulkerson. Maximal flow through a network. Canadian journal of Mathematics, 8(3):
+			399–404, 1956.
+			[15] A. M. Geoffrion and G. W. Graves. Multicommodity distribution system design by benders decomposition.
+			Management science, 20(5):822–844, 1974.
+			[16] P. Gilmore and R. Gomory. A linear programming approach to the cutting-stock problem. Operations
+			Research (volume 9), 1961.
+			[17] E. Insafutdinov, L. Pishchulin, B. Andres, M. Andriluka, and B. Schiele. Deepercut: A deeper, stronger,
+			and faster multi-person pose estimation model. In European Conference on Computer Vision, pages 34–50.
+			Springer, 2016.
+			[18] A. Kardoost and M. Keuper. Solving minimum cost lifted multicut problems by node agglomeration. In
+			ACCV 2018, 14th Asian Conference on Computer Vision, Perth, Australia, 2018.
+			[19] M. Keuper, B. Andres, and T. Brox. Motion trajectory segmentation via minimum cost multicuts. In ICCV,
+			2015.
+			9
+			[20] M. Keuper, E. Levinkov, N. Bonneel, G. Lavoué, T. Brox, and B. Andres. Efficient decomposition of
+			image and mesh graphs by lifted multicuts. In ICCV, 2015.
+			[21] S. Kim, S. Nowozin, P. Kohli, and C. D. Yoo. Higher-order correlation clustering for image segmentation.
+			In Advances in Neural Information Processing Systems,25, pages 1530–1538, 2011.
+			[22] V. Kolmogorov. Blossom v: a new implementation of a minimum cost perfect matching algorithm.
+			Mathematical Programming Computation, 1(1):43–67, 2009.
+			[23] T. L. Magnanti and R. T. Wong. Accelerating benders decomposition: Algorithmic enhancement and
+			model selection criteria. Operations research, 29(3):464–484, 1981.
+			[24] D. Martin, C. Fowlkes, D. Tal, and J. Malik. A database of human segmented natural images and its
+			application to evaluating segmentation algorithms and measuring ecological statistics. In Proceedings of
+			the Eighth International Conference on Computer Vision (ICCV-01), pages 416–423, 2001.
+			[25] S. Nowozin and S. Jegelka. Solution stability in linear programming relaxations: Graph partitioning and
+			unsupervised learning. In Proceedings of the 26th Annual International Conference on Machine Learning,
+			pages 769–776. ACM, 2009.
+			[26] X. Pan, D. Papailiopoulos, S. Oymak, B. Recht, K. Ramchandran, and M. I. Jordan. Parallel correlation
+			clustering on big graphs. In Proceedings of the 28th International Conference on Neural Information
+			Processing Systems - Volume 1, NIPS’15, pages 82–90, Cambridge, MA, USA, 2015. MIT Press. URL
+			http://dl.acm.org/citation.cfm?id=2969239.2969249.
+			[27] L. Pishchulin, E. Insafutdinov, S. Tang, B. Andres, M. Andriluka, P. V. Gehler, and B. Schiele. Deepcut:
+			Joint subset partition and labeling for multi person pose estimation. In Proceedings of the IEEE Conference
+			on Computer Vision and Pattern Recognition, pages 4929–4937, 2016.
+			[28] C. Rother, V. Kolmogorov, V. Lempitsky, and M. Szummer. Optimizing binary mrfs via extended roof
+			duality. In Computer Vision and Pattern Recognition, 2007. CVPR ’07. IEEE Conference on, pages 1–8,
+			june 2007.
+			[29] W.-K. Shih, S. Wu, and Y. Kuo. Unifying maximum cut and minimum cut of a planar graph. Computers,
+			IEEE Transactions on, 39(5):694–697, May 1990.
+			[30] P. Swoboda and B. Andres. A message passing algorithm for the minimum cost multicut problem. In
+			CVPR, 2017.
+			[31] S. Tang, B. Andres, M. Andriluka, and B. Schiele. Subgraph decomposition for multi-target tracking. In
+			CVPR, 2015.
+			[32] S. Wang, K. Kording, and J. Yarkony. Exploiting skeletal structure in computer vision annotation with
+			benders decomposition. arXiv preprint arXiv:1709.04411, 2017.
+			[33] S. Wang, A. Ihler, K. Kording, and J. Yarkony. Accelerating dynamic programs via nested benders decom-
+			position with application to multi-person pose estimation. In Proceedings of the European Conference on
+			Computer Vision (ECCV), pages 652–666, 2018.
+			[34] J. Yarkony. Next generation multicuts for semi-planar graphs. In Proceedings of the Neural Information
+			Processing Systems Optimization in Machine Learning Workshop (OPT-ML), 2015.
+			[35] J. Yarkony and C. Fowlkes. Planar ultrametrics for image segmentation. In Neural Information Processing
+			Systems, 2015.
+			[36] J. Yarkony and S. Wang. Accelerating message passing for map with benders decomposition. arXiv
+			preprint arXiv:1805.04958, 2018.
+			[37] J. Yarkony, A. Ihler, and C. Fowlkes. Fast planar correlation clustering for image segmentation. In
+			Proceedings of the 12th European Conference on Computer Vision(ECCV 2012), 2012.
+			[38] J. Yarkony, T. Beier, P. Baldi, and F. A. Hamprecht. Parallel multicut segmentation via dual decomposition.
+			In International Workshop on New Frontiers in Mining Complex Patterns, pages 56–68. Springer, 2014.
+			[39] C. Zhang, F. Huber, M. Knop, and F. Hamprecht. Yeast cell detection and segmentation in bright field
+			microscopy. In ISBI, 2014.
+
+		</biblio>
+	</article>
+</opml>'

@@ -1,0 +1,260 @@
+<?xml version="1.0" ?>
+<opml version="1.0">
+ <article>
+  <preamble>
+	  A_memetic_algorithm_for_community_detectionin_signed_networks
+  </preamble>
+  
+  <title>
+	  A memetic algorithm for community detection
+	  in signed networks
+  </title>
+  
+  <auteur>
+	  Shiwei Che1
+	  , Wu Yang1
+	  , and Wei Wang1
+	  1
+	  Information Security Research Center, Harbin Engineering University, Heilongjiang Province, China
+	  Corresponding author: Wu Yang (e-mail: yangwu@hrbeu.edu.cn).
+	  This work was supported by the National Natural Science Foundation of China (Grant No. 61572459 and 61672180).
+  </auteur>
+  
+  <abstract>
+	  ABSTRACT Community discovery (i.e. community detection) in signed networks is a division of nodes,
+	  such that the edges in the communities are positive and the edges between the communities are negative.
+	  Davis and Harary have solved the problem of community detection when a signed graph is balanced or
+	  weakly balanced. When the signed network is unbalanced, community detection becomes very complex. In
+	  this paper, we propose a novel memetic algorithm (MA) called MACD-SN for community partition (i.e.
+	  community detection) in signed networks. Firstly, we present a novel initialization algorithm used in
+	  initialization of MACD-SN. This method can accelerate the convergence rate of MACD-SN algorithm.
+	  Next, in addition to using frequently-used variation operation (in this paper, variation and mutation are
+	  interchangeable), this paper presents a novel crossover operation and a novel variation operation, which
+	  contributes to increasing the correctness of the MACD-SN algorithm's operation result and reduces its
+	  running time. Lastly, this paper proposes a new local search algorithm, which may enable the algorithm's
+	  result to jump away the local best result with a certain probability and draw near the global best result
+	  quickly. For testing the performance of MACD-SN algorithm, we have done many experiments using five
+	  kinds of synthetic signed networks and five real-world signed networks. The test outcomes show that the
+	  proposed algorithm is valid and efficient for signed network cluster partition (i.e. community detection).
+	  INDEX TERMS genetic algorithm, social network, signed network, community detection
+  </abstract>
+  
+  <introduction>
+	  I. INTRODUCTION
+	  Modern network science is an active field in understanding
+	  complex systems. Actually, a lot of complicated systems in
+	  various fields can be expressed by means of networks, for
+	  example, complex collaborative relationships [1], social
+	  systems [2], information systems [3], etc. In these networks,
+	  nodes (or vertices) represent individual participants, and
+	  edges (or links) represent relationships between participants.
+	  A great deal of research efforts have been done on complex
+	  networks, such as correlation clustering, dynamic network
+	  evolution. Generally speaking, identifying community
+	  partition is an important task in complex network analysis.
+	  Community structures exist in a lot of network systems,
+	  such as politics, economics, engineering, computer science,
+	  biology and so on. A comment on network community
+	  discovery can be found in Ref. [4]. The purpose of
+	  community discovery is to identify clusters with dense links
+	  within clusters and only sparse links between clusters [5].
+	  In theoretical research and practical activities, community
+	  discovery is of great significance. For instance, in the
+	  purchasing relations network between customers and online
+	  retailers’ products (such as www.taobao.com), identifying
+	  clusters of customers with similar interests can establish an
+	  effective recommendation system [4, 6].
+	  In human society, many relationships between people are
+	  signed, either positive or negative. Compared with traditional
+	  networks, the positive and negative edges of signed networks
+	  can more accurately describe cooperation (friendship/trust)
+	  relations and competition (hostility/distrust) relations. When
+	  two people have a relationship of trust, respect or love, the
+	  relationship can be regarded as a positive connection. But,
+	  the relationship with mistrust, disrespect or hatred can be
+	  considered as a negative connection. This network is called
+	  signed network [7], that is, the edge weight is greater than 0,
+	  indicating a positive relationship; the edge weight is less than
+	  0, indicating a negative relationship; and the edge weight is
+	  equal to 0, indicating that there is no relationship between
+	  these two individuals. Figure 1 shows a simple signed
+	  network. In the figure, the solid line edge represents a
+	  positive relationship, and the dotted line edge represents a
+	  This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/.
+	  This article has been accepted for publication in a future issue of this journal, but has not been fully edited. Content may change prior to final publication. Citation information: DOI
+	  10.1109/ACCESS.2020.3006108, IEEE Access
+	  Author Name: Preparation of Papers for IEEE Access (February 2017)
+	  2 VOLUME XX, 2017
+	  negative relationship. Community discovery in signed
+	  networks is quite different from that in unsigned networks
+	  (that is, networks only contain positive connections). In
+	  unsigned networks, the community structure is defined as a
+	  group of nodes or vertices which have dense connections
+	  within groups and sparse connections between groups.
+	  Whereas for signed social networks, communities (i.e.
+	  clusters) are defined not only by the density of connections
+	  but also by the signs of connections. The connections should
+	  be densely positive and sparsely negative in a community
+	  while densely negative and sparsely positive between
+	  communities. Many negative connections exist in the
+	  communities and many positive connections exist between
+	  the communities make community detection more difficult.
+	  A strongly (or weakly) balanced signed network can be
+	  divided into two (or more) clusters, so that all connections
+	  within clusters are positive, and all connections between
+	  clusters are negative [8-10]. However, due to the existence of
+	  negative connections in clusters and positive connections
+	  between clusters, the real world signed networks are often
+	  unbalanced. Therefore, it is a great challenge to design an
+	  effective and efficient algorithm to discover the community
+	  structure in signed graphs.
+	  FIGURE 1. A schematic diagram of a simple signed graph.
+	  Unlike previous work, this paper proposes a new memetic
+	  algorithm to detect community structure in signed networks.
+	  In order to accelerate the convergence of algorithm (decrease
+	  the numbers of loop), a novel population initialization
+	  method of memetic algorithm is presented. Besides
+	  employing the frequently-used variation operation, a novel
+	  crossover operation (called randomized two-way crossover
+	  operation in this article) and a novel variation operation
+	  (called community variation operation in this article) are also
+	  proposed, which are capable of enhancing the accuracy of the
+	  result of the algorithm and speeding up the convergence
+	  speed of population. Randomized two-way crossover
+	  operation can preferable retain the hereditary properties of
+	  previous generation individuals, and community variation
+	  operation is capable of enhancing greatly the chromosomes
+	  set (i.e. chromosomes population) multiformity of MACD-
+	  SN algorithm. Furthermore, this paper also presents a local
+	  solution space search subroutine to drive the optimal result of
+	  the offspring individuals of the MACD-SN method approach
+	  the global optimal result more quickly in the search region.
+	  This subroutine is capable of driving the MACD-SN jump
+	  away local best solution and attain global best solution with a
+	  specified odds. Many experimental results show that the
+	  proposed algorithm is effective and efficient for signed
+	  network community partition.
+	  The remaining sections of this thesis are arranged as
+	  follows: The work related to this study is illuminated in
+	  Section II. A few key concepts and background knowledge
+	  connected with this study are introduced in Section III.
+	  Section IV describes presented MACD-SN algorithm for
+	  community identification (i.e. community detection) in the
+	  signed network in detail. This section introduces the
+	  proposed MACD-SN algorithm's chromosome coding
+	  method, initialization algorithm of chromosomes set,
+	  computational formula of fitness used, tournament selection
+	  operator for chromosomes selection, crossover operator and
+	  mutation operators of genetic operation, local search function,
+	  etc. Section V shows the test results on synthetic and real
+	  signed networks. Section VI summarizes the whole paper.
+  </introduction>
+  
+  <corps>
+	  II. RELATED WORKS
+	  In recent decades, due to the emergence of a large number
+	  of community partition problems, scholars have proposed
+	  many algorithms to settle the community partition problems.
+	  Girvan and Newman presented a dividing method, which is
+	  called GN algorithm. In addition, Newman also put forward
+	  a method called FN based on GN algorithm, which uses
+	  modularity function. It is a kind of agglomeration algorithm
+	  ..............
+	  ETC ETC
+	  ..............
+	  represent positive and negative edges, respectively. Six
+	  clusters of vertices are divided by solid lines with a green
+	  color. According to the order from top left to bottom right
+	  on the main diagonal, the number of vertices in each cluster
+	  is 1741, 54398, 5922, 6413, 2746 and 1879, severally. In
+	  Figure 19, we may observe that the largest cluster with
+	  54398 vertices is loose, and the rest of clusters are dense.
+	  Among the six clusters, the clusters with 6413 vertices and
+	  1879 vertices include a large number of negative edges,
+	  while the clusters with 1741 vertices, 5922 vertices and
+	  2746 vertices include a large number of positive edges.
+  </corps>
+  
+  <discussion/>
+  
+  <conclusion>
+	  VI. CONCLUSIONS
+	  In the research field of signed graphs, cluster structure is an
+	  important network feature. For the sake of better study and
+	  take advantage of the signed networks, it is crucial to
+	  discover their cluster partition. In this paper, we propose a
+	  memetic method named MACD-SN for cluster partitions in
+	  signed networks. The individual coding method of MACD-
+	  SN algorithm adopts the well-known string-based coding
+	  method. In order to speed up the convergence, we proposed
+	  a new initialization algorithm for the cluster partitions of
+	  signed networks. The fitness function of MACD-SN
+	  algorithm uses the function presented in [35]. In order to
+	  select parent individuals for succedent genetic operations,
+	  we adopt a well-known operator (i.e. tournament selection
+	  operator), which provides chromosomes in the parent
+	  population identical probabilities to be chosen for
+	  subsequent genetic operators. In addition to the frequently-
+	  used mutation operation, this paper also presents a novel
+	  crossover operation and a novel mutation operation. The
+	  novel randomized two-way crossover operation can
+	  preferable retain the hereditary properties of the previous
+	  generation individuals, and the novel community mutation
+	  operator may greatly enhance the population diversity.
+	  Moreover, this paper presents a novel local search
+	  subroutine, which may enhance the accuracy of the ultimate
+	  output of the MACD-SN and reduce its running time, and
+	  enable the algorithm to jump out of the local best solution
+	  with a specified odds and attain the global best solution. For
+	  verifying the detection ability of the proposed algorithm, a
+	  large number of tests have been executed on five kinds of
+	  synthetic signed graphs and five real signed graphs. Next,
+	  we compare the test outcomes with four well-known signed
+	  network cluster partition methods. The comparison
+	  outcomes show that the performance of MACD-SN method
+	  is better than the other four methods, which indicates that
+	  the method proposed in this paper is an excellent method to
+	  identify cluster partitions in signed networks. The
+	  disadvantage of MACD-SN algorithm is that it can't detect
+	  overlapping communities in signed networks. We will solve
+	  this problem in our future work.
+  </conclusion>
+  
+  <biblio>
+	  REFERENCES
+	  [1] Z. Xia, Z. Bu, Community detection based on a semantic network,
+	  Knowl.-Based Syst. 26 (2012) 30–39.
+	  [2] P. Doreian, A. Mrvar, Partitioning signed social networks, Soc.
+	  Networks 31 (2009) 1–11.
+	  [3] M.E.J. Newman, The structure of scientific collaboration networks,
+	  Proc. Natl. Acad. Sci. USA, vol. 9781400841356, pp. 221–226,
+	  2011.
+	  [4] S. Fortunato, Community detection in graphs, Phys. Rep. 486 (3)
+	  (2010) 75–174.
+	  [5] M. Girvan, M.E.J. Newman, Community structure in social and
+	  biological networks, Proc. Natl. Acad. Sci. USA 99 (12) (2002)
+	  ..............
+	  ETC ETC
+	  ..............
+
+	  networks and community detection.
+	  Wu Yang received a Ph.D. degree in Computer
+	  System Architecture Specialty of Computer
+	  Science and Technology School from Harbin
+	  Institute of Technology. He is currently a
+	  professor and doctoral supervisor of Harbin
+	  Engineering University. His main research
+	  interests include wireless sensor network, peer-
+	  to-peer network and information security. He is
+	  a member of ACM and senior member of CCF.
+	  Wei Wang received a Ph.D. degree in Computer
+	  System Architecture Specialty of Computer
+	  Science and Technology School from Harbin
+	  Institute of Technology. He is currently an
+	  professor in Harbin Engineering University. His
+	  main research interests include social networks
+	  and community detection.
+  </biblio>
+  
+ </article>
+</opml>

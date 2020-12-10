@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<opml version="1.0">
+ <article>
+  <preamble>
+  </preamble>
+  
+  <title>PERFECT
+Conversational Networks for AutomaticOnline Moderation
+  </title>PERFECT
+  
+  <auteur>OK
+	Etienne Papegnies, Vincent Labatut, Richard Dufour, and Georges Linarès
+  </auteur>PERFECT
+  
+  <abstract>PERFECT
+Abstract— Moderation  of  user-generated  content  in  an  online community 
+
+Index Terms— Classification algorithms, Information retrieval,Network  theory  (graphs), Social  computing, Text  analysis.
+  </abstract>PERFECT
+  
+  <introduction>PERFECT
+I.INTRODUCTION ONLINE communities have   acquired   an   indisputable
+
+ in  Section  V  andpresent some perspectives for this paper.
+  </introduction>INCORRECT
+  
+  <corps>INCORRECT
+II.  RELATED WORK In this section, we first review general approaches related to
+
+abuses,  without considering at all the content of the exchanged messages.
+  </corps>PERFECT
+  
+  <discussion/>
+  
+  <conclusion>PERFECT
+V.   CONCLUSION In  this  paper,  we  tackle  the  problem
+
+ features  wehave presented more relevant.
+  </conclusion>PERFECT
+  
+  <biblio>PERFECT
+REFERENCES[1]   French  Republic.  (2004).Loi  n◦2004-575  du  21  Juin  2004
+
+[57]   A. Rumshiskyet  al.,  “Combining  network  and  language  indicators  fortracking  conflict  intensity,”  inProc.  Int.  Conf.  Social  Inform.Berlin,Germany: Springer,  2017, pp. 391–404
+  </biblio>PERFECT
+  
+ </article>
+</opml>
+
+precision stricte = 11 / 14
+précision souple = 12 / 14
+

@@ -1,0 +1,33 @@
+b'<opml version="1.0">
+	<article>
+		<preamble>PERFECT
+		</preamble>PERFECT
+		
+		<title>PERFECT
+		</title>OK -1
+		
+		<auteur>OK -2
+		</auteur>PERFECT
+		
+		<abstract>PERFECT
+		</abstract>PERFECT
+		
+		<introduction>PERFECT
+		</introduction>INCORRECT
+		
+		<corps>INCORRECT
+		</corps>PERFECT
+		
+		<discussion />
+		
+		<conclusion>PERFECT
+		</conclusion>PERFECT
+		
+		<biblio>PERFECT
+		</biblio>NON DETECTÉ
+	</article>
+</opml>'
+
+
+Precision souple : 13/15
+Precision stricte : 11/15

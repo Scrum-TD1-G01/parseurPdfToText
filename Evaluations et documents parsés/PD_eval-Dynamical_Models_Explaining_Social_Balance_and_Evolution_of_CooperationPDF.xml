@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<opml version="1.0">
+ <article>
+  <preamble>
+  </preamble>
+  
+  <title>INCORRECT
+	Dynamical Models Explaining Social Balance and Evolution of Cooperation
+  </title>INCORRECT
+  
+  <auteur>OK
+Vincent Antonio Traag 1 *, Paul Van Dooren 1 , Patrick De Leenheer 2
+
+1 ICTEAM, Université catholiquede Louvain, Louvain-la-Neuve, Belgium, 2 Department of Mathematics, University of Florida, Gainesville, Florida, United States of America
+  </auteur>PERFECT
+  
+  <abstract>PERFECT
+Abstract Social networks
+
+It turns out that the alternative model is able to lead to cooperative behaviour, unlike the previous model.
+  </abstract>INCORRECT
+  
+  <introduction>PERFECT
+Introduction Why do two
+
+whereas the earlier model cannot.
+  </introduction>INCORRECT
+  
+  <corps>INCORRECT
+Earlier Model Certain discrete-time,
+
+need a marginally larger benefit in order to develop cooperation.
+  </corps>INCORRECT
+  
+  <discussion/>
+  
+  <conclusion>PERFECT
+Conclusion To conclude,
+
+which yields the fixation probability r.
+  </conclusion>INCORRECT
+  
+  <biblio>PERFECT
+References 1. Heider F (1946)
+
+47. Gillespie JH (2004) Population Genetics: A Concise Guide. Baltimore: The John Hopkins University Press.
+  </biblio>OK
+  
+ </article>
+</opml>
+
+precision stricte = 5 / 14
+précision souple = 7 / 14

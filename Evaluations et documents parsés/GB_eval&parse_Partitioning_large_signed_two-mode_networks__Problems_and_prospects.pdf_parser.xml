@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+<opml version="1.0">
+ <article>
+  <preamble>
+  </preamble>
+  
+  <title>PERFECT
+  </title>PERFECT
+  
+  <auteur>INCORRECT
+  </auteur>INCORRECT
+  
+  <abstract>NON DETECTÉ
+  </abstract>NON DETECTÉ
+  
+  <introduction>PERFECT
+  </introduction>PERFECT
+  
+  <corps>PERFECT
+  </corps>PERFECT
+  
+  <discussion>PERFECT
+  </discussion>INCORRECT
+  
+  <conclusion>PERFECT
+  </conclusion>PERFECT
+  
+  <biblio>PERFECT
+  </biblio>PERFECT
+  
+ </article>
+</opml>
+
+Precision souple : 11/16
+Precision stricte : 11/16
+
+
+
+<article>
+	<title>
+		Partitioning large signed two-mode networks: Problems and prospects
+	</title>
+	<auteur>
+		Patrick Doreian a,b,∗ , Paulette Lloyd c , Andrej Mrvar b
+		a
+		
+		Department of Sociology, 2602 WWPH, University of Pittsburgh, Pittsburgh, PA 16260, USA
+		Faculty of Social Sciences, University of Ljubljana, Kardeljeva ploščad 5, SI-1000 Ljubljana, Slovenia
+		c
+		Department of Sociology, Indiana University, Ballantine Hall 744, 1020 E. Kirkwood Ave., Bloomington, IN 47405, USA
+		b
+	</auteur>
+	<abstract>
+		While a substantial amount of attention within social network analysis (SNA) has been given to the study
+		of one-mode networks, there is an increasing consideration of two-mode networks.
+		[...]
+		Although our primary purpose is methodological, we take the ﬁrst step towards bridging Heider’s structural balance theory with recent theorizing in
+		international relations on soft balancing of power processes.
+		© 2012 Elsevier B.V. All rights reserved.
+	</abstract>
+	<introduction>
+		While a substantial amount of attention within social network
+		analysis (SNA) has been given to the study of one-mode networks,
+		there is an increasing consideration of two-mode networks.
+		[...]
+		We conclude with recommendations for further methodological development of blockmodeling approaches to signed data.
+	</introduction>
+	<corps>
+		We couple relaxed structural balance to balance of power ideas
+		to provide a substantive foundation for the partitioning methods
+		we consider here.
+		[...]
+		Certainly, the literature on community detection could be very useful. We return to this in our ﬁnal section.
+	</corps>
+	<discussion>
+		During the analyses that led to the results shown here, a num- ber of difﬁcult issues emerged.
+		[...]
+		Soft balancing implies
+		alliances with consistency with regard to joint voting behavior and,
+		to capture this, the signed blockmodeling of two-mode data has
+		been operationalized in a speciﬁc and substantive driven way.
+	</discussion>
+	<conclusion>
+		We have presented results stemming from the partitioning of signed two-mode data in the form of states voting on military res- olutions that came before the UNGA for two time periods (1981–85 and 1996–2001).
+		[...]
+		For example, the complete information analysis provides the information needed to determine whether voting differences are due to a particular conﬂict (differences in how to resolve the ongoing Middle East conﬂict for example); or reﬂect more general challenges to a state or an alliances’ military power by constraining its use, e.g., through promotion of norms that prohibit the posses- sion or use of particular weaponry.
+	</conclusion>
+	<biblio>
+		References Art, R.J., 2005/2006. Correspondence: striking the balance. International Security 30 (Winter (3)), 177–196. Batagelj, V., Mrvar, A., 1998. Pajek—program for large network analysis. Connections 21, 47–57.
+		[...]
+		Zaveršnik, M., Batagelj, V., 2004. Islands, XXIV International Sunbelt Social Net- work Conference, Portorož, Slovenia, May 12–16, 2004. Available from: http://vlado.fmf.uni-lj.si/pub/networks/Doc/Sunbelt/islands.pdf.
+	</biblio>
+</article>

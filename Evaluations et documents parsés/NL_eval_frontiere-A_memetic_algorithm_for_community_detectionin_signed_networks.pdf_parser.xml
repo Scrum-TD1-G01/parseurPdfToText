@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<opml version="1.0">
+ <article>
+  <preamble>PERFECT
+  </preamble>PERFECT
+  
+  <title>INCORRECT
+  </title>INCORRECT
+  
+  <auteur>INCORRECT
+  </auteur>PERFECT
+  
+  <abstract>PERFECT
+  </abstract>PERFECT
+  
+  <introduction>PERFECT
+  </introduction>INCORRECT
+  
+  <corps>INCORRECT
+  </corps>PERFECT
+  
+  <discussion/>
+  
+  <conclusion>PERFECT
+  </conclusion>PERFECT
+  
+  <biblio>PERFECT
+  </biblio>PERFECT
+  
+ </article>
+</opml>
+
+Precision stricte : 11/16
+Precision souple : 11/16
