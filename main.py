@@ -11,7 +11,7 @@ from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from xml.dom import minidom
 import xml
 # -*- coding: utf-8 -*-
-def prettify(elem):
+def prettify(elem):#met des saut de lignes entre les balise pour etre lisible par un humain
 	try:
 		rough_string = ElementTree.tostring(elem, encoding='utf-8')
 		reparsed = minidom.parseString(rough_string)
@@ -105,20 +105,20 @@ else:
 
 # recuperer les metadata (titre + auteur))
 raw_pdf = open(fileToParse,'rb')#recuperer le pdf raw pour extract les metadata
-parser = PDFParser(raw_pdf)
+parser = PDFParser(raw_pdf)#PDFParser est la function pdftotext mais integré a python
 doc = PDFDocument(parser)#cast le PDF en doc dans notre code
 
 
-try :
-	if(doc.info[0] and doc.info[0]['Title']):
+try :#doc.info=metadata recuperer du pdf
+	if(doc.info[0] and doc.info[0]['Title']):#si les metadata existe et que il y une metadata titre
 		try:
 			data['title'] = doc.info[0]['Title'].decode("utf-16")
-		except UnicodeDecodeError:
+		except UnicodeDecodeError:#en cas de probleme de lecture d'encodage
 			data['title'] = str(doc.info[0]['Title'])
 	else:
 		data['title'] = lines[0].strip()+'\n'
 except:
-	data['title'] = lines[0].strip()+'\n'
+	data['title'] = lines[0].strip()+'\n'#si pas de metadata ou metadata vide alors on prend la premiere ligne
 
 '''
 # authorinhtml = False  -> pas 'Author' dans copied
